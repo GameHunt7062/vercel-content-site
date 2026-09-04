@@ -1,0 +1,34 @@
+{
+  "name": "vercel-content-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "latest",
+    "@tiptap/extension-color": "latest",
+    "@tiptap/extension-highlight": "latest",
+    "@tiptap/extension-image": "latest",
+    "@tiptap/extension-link": "latest",
+    "@tiptap/extension-text-style": "latest",
+    "@tiptap/pm": "latest",
+    "@tiptap/react": "latest",
+    "@tiptap/starter-kit": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "typescript": "latest"
+  }
+}

@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+html { scroll-behavior: smooth; }
+body { background: #fafafa; color: #111; }
+
+.tiptap { outline: none; }
+.tiptap h1 { font-size: 2.25rem; line-height: 1.15; font-weight: 800; margin: 1.5rem 0 .75rem; }
+.tiptap h2 { font-size: 1.7rem; line-height: 1.2; font-weight: 750; margin: 1.35rem 0 .65rem; }
+.tiptap h3 { font-size: 1.3rem; line-height: 1.25; font-weight: 700; margin: 1.15rem 0 .55rem; }
+.tiptap p { margin: .75rem 0; line-height: 1.75; }
+.tiptap ul { list-style: disc; padding-left: 1.5rem; margin: .8rem 0; }
+.tiptap ol { list-style: decimal; padding-left: 1.5rem; margin: .8rem 0; }
+.tiptap blockquote { border-left: 4px solid #bbb; padding-left: 1rem; color: #555; margin: 1rem 0; }
+.tiptap pre { background: #18181b; color: #f4f4f5; border-radius: .75rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
+.tiptap code { background: #e4e4e7; padding: .12rem .3rem; border-radius: .25rem; }
+.tiptap pre code { background: transparent; padding: 0; }
+.tiptap a { text-decoration: underline; }
+.tiptap img { max-width: 100%; border-radius: .8rem; margin: 1rem 0; }
