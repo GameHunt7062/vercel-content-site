@@ -33,6 +33,7 @@ export default function ArticleEditor({ initialContent, onSave }: Props) {
   if (!editor) return <div>Loading editor...</div>;
 
   async function save() {
+    if (!editor) return;  
     setSaving(true);
     try { await onSave(editor.getJSON()); }
     finally { setSaving(false); }
