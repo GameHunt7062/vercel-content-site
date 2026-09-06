@@ -17,8 +17,6 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RAWME ARZU",
-    description: "Articles and artwork",
     images: ["/og-image.jpg"],
   },
 };
