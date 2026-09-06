@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Hero from "@/components/Hero";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -12,12 +13,9 @@ export default async function Home() {
     .order("created_at", { ascending: false }).limit(6);
 
   return (
-    <main className="max-w-6xl mx-auto px-6 py-16">
-      <section className="mb-16">
-        <p className="text-sm uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Welcome</p>
-        <h1 className="text-5xl md:text-7xl font-black mt-3">Ideas, Articles & Art.</h1>
-        <p className="mt-5 text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl">A personal space for writing, experiments and artwork.</p>
-      </section>
+    <>
+      <Hero />
+      <main className="max-w-6xl mx-auto px-6 py-16">
 
       <section>
         <div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold">Latest Articles</h2><Link href="/articles">View all →</Link></div>
@@ -34,6 +32,7 @@ export default async function Home() {
           {(artworks ?? []).map((a) => <Link key={a.slug} href={`/art/${a.slug}`}><img src={a.image_url} alt={a.title} className="aspect-square object-cover rounded-xl"/><h3 className="font-semibold mt-2">{a.title}</h3></Link>)}
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
