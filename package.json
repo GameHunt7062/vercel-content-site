@@ -20,13 +20,12 @@
     "@tiptap/react": "latest",
     "@tiptap/starter-kit": "latest",
     "next": "latest",
+    "next-themes": "latest",
     "react": "latest",
     "react-dom": "latest",
     "tailwindcss": "latest",
     "@tailwindcss/postcss": "latest",
     "postcss": "latest"
-    "next-themes": "latest",
-    "next": "latest",
   },
   "devDependencies": {
     "@types/node": "latest",
