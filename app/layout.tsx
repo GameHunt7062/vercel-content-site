@@ -3,8 +3,28 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata = {
-  title: "My Content Site",
+  metadataBase: new URL("https://rawme.vercel.app"),
+  title: "RAWME ARZU",
   description: "Articles and artwork",
+  openGraph: {
+    title: "RAWME ARZU",
+    description: "Articles and artwork",
+    url: "https://rawme.vercel.app",
+    siteName: "RAWME ARZU",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 675,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RAWME ARZU",
+    description: "Articles and artwork",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
