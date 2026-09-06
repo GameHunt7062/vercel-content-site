@@ -21,7 +21,7 @@ export default function ArtworkEditForm({artwork}:{artwork:any}){
   }
 
   return <div className="space-y-4">
-    <img src={artwork.image_url} alt="" className="w-full max-h-[500px] object-contain rounded-xl bg-zinc-100"/>
+    <img src={artwork.image_url} alt="" className="w-full max-h-[500px] object-contain rounded-xl bg-zinc-100 dark:bg-zinc-800"/>
     <input value={title} onChange={e=>setTitle(e.target.value)} className="w-full border rounded-lg p-3"/>
     <input value={category} onChange={e=>setCategory(e.target.value)} className="w-full border rounded-lg p-3"/>
     <textarea value={description} onChange={e=>setDescription(e.target.value)} className="w-full border rounded-lg p-3"/>
