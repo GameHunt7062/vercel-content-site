@@ -4,13 +4,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata = {
   metadataBase: new URL("https://rawme.vercel.app"),
-  title: "RAWME ARZU",
-  description: "Articles and artwork",
   openGraph: {
-    title: "RAWME ARZU",
-    description: "Articles and artwork",
     url: "https://rawme.vercel.app",
-    siteName: "RAWME ARZU",
+    siteName: "RAWME",
     images: [
       {
         url: "/og-image.jpg",
