@@ -39,10 +39,10 @@ export default function ArticleEditor({ initialContent, onSave }: Props) {
     finally { setSaving(false); }
   }
 
-  const btn = "px-2 py-1 rounded border text-sm hover:bg-zinc-100";
+  const btn = "px-2 py-1 rounded border text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800";
 
   return (
-    <div className="border rounded-xl overflow-hidden bg-white">
+    <div className="border rounded-xl overflow-hidden bg-white dark:bg-zinc-900">
       <div className="flex flex-wrap gap-2 p-3 border-b">
         <button className={btn} onClick={() => editor.chain().focus().toggleBold().run()}>Bold</button>
         <button className={btn} onClick={() => editor.chain().focus().toggleItalic().run()}>Italic</button>
