@@ -17,6 +17,25 @@
 html { scroll-behavior: smooth; }
 body { background: var(--background); color: var(--foreground); }
 
+/* --- Hero typography (RAWME / ARZU section) ---
+   Font: "Flegrei" — an Adobe Originals typeface (fonts.adobe.com/fonts/flegrei),
+   only available via Adobe Fonts web embed (see the <head> comment in
+   app/layout.tsx for the setup steps). There is no file to drop in here —
+   once the Adobe stylesheet is linked, just make sure the family name
+   below matches what Adobe assigns (normally "flegrei"). Until then,
+   .hero-word falls back to a heavy system sans so the layout still looks
+   right. */
+.hero-word {
+  margin: 0;
+  font-family: "flegrei", "Arial Black", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  font-size: clamp(2.5rem, 9vw, 9rem);
+  white-space: nowrap;
+}
+
 .tiptap { outline: none; }
 .tiptap h1 { font-size: 2.25rem; line-height: 1.15; font-weight: 800; margin: 1.5rem 0 .75rem; }
 .tiptap h2 { font-size: 1.7rem; line-height: 1.2; font-weight: 750; margin: 1.35rem 0 .65rem; }
