@@ -20,7 +20,7 @@ export default function Login() {
     <h1 className="text-3xl font-black mb-8">Admin Login</h1>
     <input className="w-full border rounded-lg p-3 mb-3" placeholder="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
     <input className="w-full border rounded-lg p-3 mb-3" placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)}/>
-    {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+    {error && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{error}</p>}
     <button onClick={login} className="w-full bg-black text-white rounded-lg p-3">Login</button>
   </main>;
 }
