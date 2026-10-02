@@ -13,9 +13,6 @@ export const metadata: Metadata = {
     default: "RAWME",
     template: "%s | RAWME",
   },
-
-  description: "The personal website of GameHunt.",
-
   alternates: {
     canonical: SITE_URL,
   },
@@ -30,8 +27,6 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "RAWME",
-    title: "RAWME",
-    description: "The personal website of GameHunt.",
     images: [
       {
         url: OG_IMAGE,
@@ -46,8 +41,6 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "RAWME",
-    description: "The personal website of GameHunt.",
     images: [OG_IMAGE],
   },
 
