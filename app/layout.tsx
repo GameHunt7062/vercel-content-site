@@ -1,4 +1,3 @@
-```tsx
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -111,4 +110,3 @@ export default function RootLayout({
     </html>
   );
 }
-```
