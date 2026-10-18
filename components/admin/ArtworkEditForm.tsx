@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { removeFromStorage, uploadImage } from "@/lib/artwork";
+import DeleteButton from "@/components/admin/DeleteButton";
 
 type Slide = { key: string; url?: string; file?: File; preview: string };
 
@@ -118,6 +119,10 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
       <button disabled={busy} onClick={save} className="bg-black text-white rounded-lg px-5 py-3 disabled:opacity-50">
         {busy ? "Saving..." : "Save Changes"}
       </button>
+
+      <div className="pt-6 mt-2 border-t">
+        <DeleteButton table="artworks" id={artwork.id} name={artwork.title} kind="artwork" redirectTo="/art" storageUrls={original} />
+      </div>
     </div>
   );
 }
