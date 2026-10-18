@@ -2,6 +2,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import type { Metadata } from "next";
+import { AdminProvider } from "@/components/admin/AdminProvider";
+import { getAdminUser } from "@/lib/admin";
 
 const SITE_URL = "https://rawme.vercel.app";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -49,11 +51,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const admin = await getAdminUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -96,8 +100,10 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
         >
-          <Navbar />
-          {children}
+          <AdminProvider initialIsAdmin={!!admin}>
+            <Navbar />
+            {children}
+          </AdminProvider>
         </ThemeProvider>
       </body>
     </html>
