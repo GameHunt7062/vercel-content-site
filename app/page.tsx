@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import Hero from "@/components/Hero";
 import { EditLink } from "@/components/admin/EditButton";
+import SlideCount from "@/components/artwork/SlideCount";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -34,7 +35,7 @@ export default async function Home() {
         <div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold">Artwork</h2><Link href="/art">View all →</Link></div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
           {(artworks ?? []).map((a) => <div key={a.slug} className="relative">
-            <Link href={`/art/${a.slug}`}><img src={a.image_url} alt={a.title} className="aspect-square object-cover rounded-xl"/><h3 className="font-semibold mt-2">{a.title}</h3></Link>
+            <Link href={`/art/${a.slug}`}><div className="relative"><img src={a.image_url} alt={a.title} className="aspect-square object-cover rounded-xl"/><SlideCount count={a.images?.length} /></div><h3 className="font-semibold mt-2">{a.title}</h3></Link>
             <EditLink href={`/admin/artwork/${a.id}`} />
           </div>)}
         </div>
