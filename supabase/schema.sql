@@ -25,6 +25,7 @@ create table public.artworks (
   slug text unique not null,
   description text,
   image_url text not null,
+  images text[] not null default '{}',
   category text,
   tags text[],
   created_at timestamptz not null default now(),

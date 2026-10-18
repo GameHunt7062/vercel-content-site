@@ -10,7 +10,7 @@ export default async function Home() {
     .eq("status", "published").order("published_at", { ascending: false }).limit(6);
 
   const { data: artworks } = await supabase
-    .from("artworks").select("id,title,slug,image_url,category")
+    .from("artworks").select("id,title,slug,image_url,category,images")
     .order("created_at", { ascending: false }).limit(6);
 
   return (

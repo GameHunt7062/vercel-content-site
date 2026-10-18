@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import EditButton from "@/components/admin/EditButton";
+import ArtworkSlider from "@/components/artwork/ArtworkSlider";
 
 export default async function ArtworkPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -13,6 +14,6 @@ export default async function ArtworkPage({ params }: { params: Promise<{ slug: 
       <div><p className="text-sm text-zinc-500 dark:text-zinc-400">{artwork.category}</p><h1 className="text-4xl font-black mt-2">{artwork.title}</h1><p className="mt-3 text-zinc-600 dark:text-zinc-400">{artwork.description}</p></div>
       <EditButton href={`/admin/artwork/${artwork.id}`} label="Edit Artwork" />
     </div>
-    <img src={artwork.image_url} alt={artwork.title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-zinc-100 dark:bg-zinc-800"/>
+    <ArtworkSlider images={artwork.images?.length ? artwork.images : [artwork.image_url]} title={artwork.title} />
   </main>;
 }
