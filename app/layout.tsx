@@ -7,7 +7,7 @@ import { getAdminUser } from "@/lib/admin";
 
 const SITE_URL = "https://rawme.vercel.app";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
-const SITE_DESCRIPTION = "The personal website of GameHunt.";
+const SITE_DESCRIPTION = "Rawme Arzu and his things";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
