@@ -1,12 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
 const DURATION = 350;
+
+// useLayoutEffect on the client (no flash of slide 1 when opening /art/x#2), useEffect on the server
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/** "#2" -> 2 (only if it is a real slide number), otherwise null */
+function parseHash(count: number) {
+  const n = parseInt(window.location.hash.slice(1), 10);
+  return Number.isInteger(n) && n >= 1 && n <= count ? n : null;
+}
+
+/** Slide 1 -> clean URL, slide N -> "#N". replaceState: no history spam, no scroll jump. */
+function writeHash(n: number) {
+  const hash = n === 1 ? "" : `#${n}`;
+  window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search + hash);
+}
 
 /**
  * Infinite-loop slider. Renders [last, ...images, first]; after sliding onto a clone
  * it silently jumps (no animation) to the matching real slide, so it never "ends".
+ * The URL hash (#1, #2 …) always matches the visible slide, so any slide is linkable.
  */
 export default function ArtworkSlider({ images, title }: { images: string[]; title: string }) {
   const count = images.length;
@@ -15,15 +31,10 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
   const locked = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startX = useRef<number | null>(null);
+  const posRef = useRef(1);
+  useEffect(() => { posRef.current = pos; }, [pos]);
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
-
-  if (count <= 1) {
-    return <img src={images[0]} alt={title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-zinc-100 dark:bg-zinc-800" />;
-  }
-
-  const slides = [images[count - 1], ...images, images[0]];
-  const current = pos === 0 ? count : pos === count + 1 ? 1 : pos; // 1-based real slide
+  const toReal = (p: number) => (p === 0 ? count : p === count + 1 ? 1 : p);
 
   function settle(p: number) {
     if (timer.current) clearTimeout(timer.current);
@@ -37,9 +48,37 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
     locked.current = true;
     setAnimate(true);
     setPos(p);
+    writeHash(toReal(p));
     // fallback in case transitionend never fires (hidden tab, reduced motion…)
     timer.current = setTimeout(() => settle(p), DURATION + 80);
   }
+
+  // open the slide named in the URL (/art/x#2) before the first paint
+  useIsoLayoutEffect(() => {
+    const n = count > 1 ? parseHash(count) : null;
+    if (n && n !== 1) { setAnimate(false); setPos(n); }
+  }, [count]);
+
+  // user edits the hash, or follows a #N link, or uses back/forward
+  useEffect(() => {
+    if (count <= 1) return;
+    function onHashChange() {
+      const n = parseHash(count);
+      if (n && n !== toReal(posRef.current)) moveTo(n);
+    }
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count]);
+
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+
+  if (count <= 1) {
+    return <img src={images[0]} alt={title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-zinc-100 dark:bg-zinc-800" />;
+  }
+
+  const slides = [images[count - 1], ...images, images[0]];
+  const current = toReal(pos); // 1-based real slide
 
   const next = () => moveTo(pos + 1);
   const prev = () => moveTo(pos - 1);

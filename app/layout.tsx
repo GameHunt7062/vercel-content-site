@@ -7,6 +7,7 @@ import { getAdminUser } from "@/lib/admin";
 
 const SITE_URL = "https://rawme.vercel.app";
 const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+const SITE_DESCRIPTION = "The personal website of GameHunt.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -15,8 +16,9 @@ export const metadata: Metadata = {
     default: "RAWME",
     template: "%s | RAWME",
   },
+  description: SITE_DESCRIPTION,
   alternates: {
-    canonical: SITE_URL,
+    canonical: "./", // resolves to each page's own URL (pages can override)
   },
 
   robots: {
@@ -27,8 +29,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: SITE_URL,
+    url: "./",
     siteName: "RAWME",
+    title: "RAWME",
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: OG_IMAGE,
@@ -43,6 +47,8 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
+    title: "RAWME",
+    description: SITE_DESCRIPTION,
     images: [OG_IMAGE],
   },
 
@@ -65,33 +71,6 @@ export default async function RootLayout({
           rel="stylesheet"
           href="https://use.typekit.net/pmo6wwa.css"
         />
-
-        {/* Open Graph fallback */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={SITE_URL} />
-        <meta property="og:title" content="RAWME" />
-        <meta
-          property="og:description"
-          content="The personal website of GameHunt."
-        />
-        <meta property="og:image" content={OG_IMAGE} />
-        <meta property="og:image:secure_url" content={OG_IMAGE} />
-        <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="675" />
-        <meta property="og:image:alt" content="RAWME" />
-
-        {/* Twitter/X fallback */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="RAWME" />
-        <meta
-          name="twitter:description"
-          content="The personal website of GameHunt."
-        />
-        <meta name="twitter:image" content={OG_IMAGE} />
-
-        {/* Basic crawler metadata */}
-        <meta name="robots" content="index, follow" />
       </head>
 
       <body>
