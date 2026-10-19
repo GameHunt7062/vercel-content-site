@@ -18,7 +18,7 @@ const hues = Object.values(SHADES);
 /** 12 columns x 5 rows: neutrals + brand colors, then light -> dark of 12 hues */
 export const TEXT_COLORS: string[] = [
   "#000000", "#27272a", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8",
-  "#ffffff", "#000cff", "#00a884", "#ef4444", "#f59e0b", "#8b5cf6",
+  "#ffffff", "#000cff", "#00a884", "#dc2626", "#ea580c", "#a855f7",
   ...[0, 1, 2, 3].flatMap((i) => hues.map((h) => h[i])),
 ];
 

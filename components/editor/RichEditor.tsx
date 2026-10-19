@@ -302,10 +302,17 @@ export default function RichEditor({ initialContent, onChange, minHeight = 320, 
     onUpdate: ({ editor }) => onChangeRef.current?.({ json: editor.getJSON(), text: editor.getText() }),
   });
 
+  if (!editor) {
+    return <div className="rounded-xl border border-zinc-300 p-6 text-sm text-zinc-500 dark:border-zinc-700" style={{ minHeight }}>Loading editor…</div>;
+  }
+  // The toolbar lives in its own component so useEditorState always receives a real editor.
+  return <EditorShell editor={editor} />;
+}
+
+function EditorShell({ editor }: { editor: Editor }) {
   const s = useEditorState({
     editor,
     selector: ({ editor }) => {
-      if (!editor) return null;
       const text = editor.getText();
       return {
         bold: editor.isActive("bold"),
@@ -331,10 +338,6 @@ export default function RichEditor({ initialContent, onChange, minHeight = 320, 
       };
     },
   });
-
-  if (!editor || !s) {
-    return <div className="rounded-xl border border-zinc-300 p-6 text-sm text-zinc-500 dark:border-zinc-700" style={{ minHeight }}>Loading editor…</div>;
-  }
 
   const c = () => editor.chain().focus();
   const textColor = normalizeHex(s.color);
