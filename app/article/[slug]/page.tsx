@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import EditButton from "@/components/admin/EditButton";
 import ShareButton from "@/components/ShareButton";
 import ArticleViewer from "@/components/articles/ArticleViewer";
+import PublishedDate from "@/components/PublishedDate";
 
 const SITE_URL = "https://rawme.vercel.app";
 
@@ -53,7 +54,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return <main className="max-w-4xl mx-auto px-6 py-12">
     <div className="flex justify-between gap-5 items-start mb-8">
-      <div><p className="text-sm text-zinc-500 dark:text-zinc-400">{article.category}</p><h1 className="text-5xl font-black mt-2">{article.title}</h1><p className="text-zinc-500 dark:text-zinc-400 mt-3">{article.excerpt}</p></div>
+      <div><p className="text-sm text-zinc-500 dark:text-zinc-400">{article.category}</p><h1 className="text-5xl font-black mt-2">{article.title}</h1><PublishedDate date={article.published_at ?? article.created_at} className="mt-3" /><p className="text-zinc-500 dark:text-zinc-400 mt-3">{article.excerpt}</p></div>
       <div className="flex gap-2 shrink-0">
         <ShareButton title={article.title} />
         <EditButton href={`/admin/articles/${article.id}`} label="Edit Article" />

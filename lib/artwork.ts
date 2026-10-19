@@ -63,7 +63,14 @@ async function uniqueSlug(base: string, taken: Set<string>) {
 
 /** Inserts an artwork with a guaranteed-unique slug. Returns the slug. */
 export async function insertArtwork(
-  row: { title: string; description: string | null; category: string | null; images: string[] },
+  row: {
+    title: string;
+    description: string | null;
+    description_json: any | null;
+    published_at: string;
+    category: string | null;
+    images: string[];
+  },
   taken: Set<string> = new Set()
 ) {
   const supabase = createClient();

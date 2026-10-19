@@ -1,21 +1,17 @@
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import Highlight from "@tiptap/extension-highlight";
-import Color from "@tiptap/extension-color";
-import { TextStyle } from "@tiptap/extension-text-style";
+import { getExtensions } from "@/components/editor/extensions";
 
-export default function ArticleViewer({ content }: { content: any }) {
+/** Read-only renderer for any Tiptap JSON (articles and artwork descriptions). */
+export default function ArticleViewer({ content, className = "" }: { content: any; className?: string }) {
   const editor = useEditor({
     immediatelyRender: false,
     editable: false,
-    extensions: [StarterKit, Link, Image, Highlight, TextStyle, Color],
+    extensions: getExtensions(false),
     content,
   });
 
   if (!editor) return null;
-  return <div className="tiptap"><EditorContent editor={editor} /></div>;
+  return <div className={`tiptap ${className}`}><EditorContent editor={editor} /></div>;
 }

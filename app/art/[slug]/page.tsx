@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import EditButton from "@/components/admin/EditButton";
 import ShareButton from "@/components/ShareButton";
 import ArtworkSlider from "@/components/artwork/ArtworkSlider";
+import ArticleViewer from "@/components/articles/ArticleViewer";
+import PublishedDate from "@/components/PublishedDate";
 
 const SITE_URL = "https://rawme.vercel.app";
 
@@ -54,12 +56,21 @@ export default async function ArtworkPage({ params }: { params: Promise<{ slug: 
 
   return <main className="max-w-5xl mx-auto px-6 py-12">
     <div className="flex justify-between items-start gap-5 mb-8">
-      <div><p className="text-sm text-zinc-500 dark:text-zinc-400">{artwork.category}</p><h1 className="text-4xl font-black mt-2">{artwork.title}</h1><p className="mt-3 text-zinc-600 dark:text-zinc-400">{artwork.description}</p></div>
+      <div>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">{artwork.category}</p>
+        <h1 className="text-4xl font-black mt-2">{artwork.title}</h1>
+        <PublishedDate date={artwork.published_at ?? artwork.created_at} className="mt-3" />
+      </div>
       <div className="flex gap-2 shrink-0">
         <ShareButton title={artwork.title} />
         <EditButton href={`/admin/artwork/${artwork.id}`} label="Edit Artwork" />
       </div>
     </div>
     <ArtworkSlider images={artwork.images?.length ? artwork.images : [artwork.image_url]} title={artwork.title} />
+    {artwork.description_json ? (
+      <ArticleViewer content={artwork.description_json} className="mt-10 max-w-3xl" />
+    ) : artwork.description ? (
+      <p className="mt-10 max-w-3xl whitespace-pre-line text-zinc-600 dark:text-zinc-400">{artwork.description}</p>
+    ) : null}
   </main>;
 }

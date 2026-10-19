@@ -61,3 +61,9 @@ Deploy.
 The UI hides edit controls from visitors, but the real security comes from Supabase RLS policies. Only users listed in `public.admins` can insert/update/delete content.
 
 This starter intentionally keeps the editor and admin workflow straightforward. For production, add image upload inside Tiptap, delete/replace cleanup in Storage, slug editing, autosave, richer toolbar controls, validation, rate limiting, and better error UI.
+
+## Update: rich editor, rich artwork description, published date
+
+1. Run `supabase/add-rich-description-and-dates.sql` ONCE in the Supabase SQL Editor (before deploying).
+2. Run `npm install` (adds `@tiptap/extension-text-align` and `@tiptap/extensions`).
+3. Deploy.

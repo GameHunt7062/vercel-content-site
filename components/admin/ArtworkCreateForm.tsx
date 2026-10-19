@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fileToTitle, insertArtwork, removeFromStorage, uploadImage } from "@/lib/artwork";
+import RichEditor, { type EditorChange } from "@/components/editor/RichEditor";
+import DateTimeField from "@/components/admin/DateTimeField";
+import { docHasContent } from "@/lib/richtext";
 
 type Item = { id: string; file: File; title: string; preview: string };
 type Mode = "bulk" | "slides";
@@ -13,7 +16,8 @@ export default function ArtworkCreateForm() {
   const [items, setItems] = useState<Item[]>([]);
   const [slideTitle, setSlideTitle] = useState("");
   const [category, setCategory] = useState("");
-  const [description, setDescription] = useState("");
+  const [desc, setDesc] = useState<EditorChange | null>(null);
+  const [publishedAt, setPublishedAt] = useState(""); // "" = now
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
@@ -55,7 +59,13 @@ export default function ArtworkCreateForm() {
     if (!items.length) { alert("Select at least one image."); return; }
     setBusy(true);
     setErrors([]);
-    const common = { description: description.trim() || null, category: category.trim() || null };
+    const hasDesc = !!desc && docHasContent(desc.json);
+    const common = {
+      description: hasDesc ? desc!.text.trim() || null : null,
+      description_json: hasDesc ? desc!.json : null,
+      published_at: publishedAt || new Date().toISOString(), // same time for every artwork in a bulk upload
+      category: category.trim() || null,
+    };
     const taken = new Set<string>();
 
     try {
@@ -163,7 +173,13 @@ export default function ArtworkCreateForm() {
         <input value={slideTitle} onChange={(e) => setSlideTitle(e.target.value)} placeholder="Title (optional — first file name if empty)" className="w-full border rounded-lg p-3" />
       )}
       <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder={mode === "bulk" ? "Category (optional, applied to all)" : "Category (optional)"} className="w-full border rounded-lg p-3" />
-      <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={mode === "bulk" ? "Description (optional, applied to all)" : "Description (optional)"} className="w-full border rounded-lg p-3" />
+      <div>
+        <p className="mb-2 text-sm font-semibold">
+          Description <span className="font-normal text-zinc-500 dark:text-zinc-400">({mode === "bulk" ? "optional, applied to all" : "optional"})</span>
+        </p>
+        <RichEditor minHeight={160} placeholder="Write about this artwork — links, bold, colors, code blocks all work…" onChange={setDesc} />
+      </div>
+      <DateTimeField value={publishedAt} onChange={setPublishedAt} />
 
       {n > 0 && (
         <ul className="space-y-2">

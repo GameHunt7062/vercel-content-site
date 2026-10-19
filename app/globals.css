@@ -46,3 +46,20 @@ body { background: var(--background); color: var(--foreground); }
 
 .dark .tiptap blockquote { border-left-color: #52525b; color: #a1a1aa; }
 .dark .tiptap code { background: #3f3f46; color: #f4f4f5; }
+
+/* --- Rich text additions --- */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #a1a1aa;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.tiptap mark { color: #111; border-radius: .2rem; padding: 0 .15em; background-color: #fde047; }
+.tiptap a { color: #2563eb; cursor: pointer; }
+.dark .tiptap a { color: #60a5fa; }
+.tiptap hr { border: 0; border-top: 2px solid #d4d4d8; margin: 1.75rem 0; }
+.dark .tiptap hr { border-top-color: #3f3f46; }
+.tiptap img.ProseMirror-selectednode { outline: 3px solid #3b82f6; }
+.tiptap s { text-decoration: line-through; }
+.tiptap pre code { color: inherit; }

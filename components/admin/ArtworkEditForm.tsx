@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { removeFromStorage, uploadImage } from "@/lib/artwork";
 import DeleteButton from "@/components/admin/DeleteButton";
+import RichEditor, { type EditorChange } from "@/components/editor/RichEditor";
+import DateTimeField from "@/components/admin/DateTimeField";
+import { docHasContent, textToDoc } from "@/lib/richtext";
 
 type Slide = { key: string; url?: string; file?: File; preview: string };
 
@@ -13,7 +16,10 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
   const original: string[] = artwork.images?.length ? artwork.images : [artwork.image_url];
 
   const [title, setTitle] = useState<string>(artwork.title);
-  const [description, setDescription] = useState<string>(artwork.description ?? "");
+  // new rich description if present, otherwise the old plain-text description converted to paragraphs
+  const initialDoc = artwork.description_json ?? (artwork.description ? textToDoc(artwork.description) : null);
+  const [desc, setDesc] = useState<EditorChange>({ json: initialDoc, text: artwork.description ?? "" });
+  const [publishedAt, setPublishedAt] = useState<string>(artwork.published_at ?? artwork.created_at ?? "");
   const [category, setCategory] = useState<string>(artwork.category ?? "");
   const [slides, setSlides] = useState<Slide[]>(original.map((url) => ({ key: url, url, preview: url })));
   const [busy, setBusy] = useState(false);
@@ -52,6 +58,7 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
     setBusy(true);
     const supabase = createClient();
     const newlyUploaded: string[] = [];
+    const hasDesc = docHasContent(desc.json);
     try {
       const images: string[] = [];
       for (const s of slides) {
@@ -66,7 +73,9 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
         .from("artworks")
         .update({
           title: title.trim() || artwork.title,
-          description: description.trim() || null,
+          description: hasDesc ? desc.text.trim() || null : null,
+          description_json: hasDesc ? desc.json : null,
+          published_at: publishedAt || artwork.published_at || artwork.created_at || new Date().toISOString(),
           category: category.trim() || null,
           image_url: images[0],
           images,
@@ -115,7 +124,11 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
 
       <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className="w-full border rounded-lg p-3" />
       <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Category (optional)" className="w-full border rounded-lg p-3" />
-      <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description (optional)" className="w-full border rounded-lg p-3" />
+      <div>
+        <p className="mb-2 text-sm font-semibold">Description <span className="font-normal text-zinc-500 dark:text-zinc-400">(optional)</span></p>
+        <RichEditor initialContent={initialDoc ?? undefined} minHeight={200} placeholder="Write about this artwork…" onChange={setDesc} />
+      </div>
+      <DateTimeField value={publishedAt} onChange={setPublishedAt} />
       <button disabled={busy} onClick={save} className="bg-black text-white rounded-lg px-5 py-3 disabled:opacity-50">
         {busy ? "Saving..." : "Save Changes"}
       </button>

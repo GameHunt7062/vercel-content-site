@@ -24,12 +24,14 @@ create table public.artworks (
   title text not null,
   slug text unique not null,
   description text,
+  description_json jsonb,
   image_url text not null,
   images text[] not null default '{}',
   category text,
   tags text[],
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  published_at timestamptz not null default now()
 );
 
 alter table public.admins enable row level security;

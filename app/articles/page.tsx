@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EditLink } from "@/components/admin/EditButton";
 import { createClient } from "@/lib/supabase/server";
+import PublishedDate from "@/components/PublishedDate";
 
 export default async function Articles() {
   const supabase = await createClient();
@@ -11,7 +12,7 @@ export default async function Articles() {
     <div className="grid md:grid-cols-2 gap-5">
       {(data ?? []).map(a => <div key={a.id} className="relative">
         <Link href={`/article/${a.slug}`} className="block bg-white dark:bg-zinc-900 border rounded-xl p-6 hover:shadow">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">{a.category}</p><h2 className="text-2xl font-bold mt-2">{a.title}</h2><p className="mt-2 text-zinc-600 dark:text-zinc-400">{a.excerpt}</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">{a.category}</p><h2 className="text-2xl font-bold mt-2">{a.title}</h2><PublishedDate date={a.published_at ?? a.created_at} prefix="" className="mt-1" /><p className="mt-2 text-zinc-600 dark:text-zinc-400">{a.excerpt}</p>
         </Link>
         <EditLink href={`/admin/articles/${a.id}`} />
       </div>)}
