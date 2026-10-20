@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
+import { getMarkRange } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import { getExtensions } from "./extensions";
 import { HIGHLIGHT_COLORS, TEXT_COLORS, loadRecentColors, normalizeHex, rememberColor } from "./colors";
@@ -199,34 +200,45 @@ function normalizeUrl(raw: string) {
 }
 
 function LinkPanel({ editor, close, href }: { editor: Editor; close: () => void; href: string }) {
+  // The text the link will sit on: the selected text, or the whole existing link, or nothing yet.
+  const [target] = useState(() => {
+    const { from, to } = editor.state.selection;
+    let range = { from, to };
+    if (editor.isActive("link")) {
+      const r = getMarkRange(editor.state.doc.resolve(from), editor.schema.marks.link);
+      if (r) range = r;
+    }
+    return { range, text: editor.state.doc.textBetween(range.from, range.to, " ") };
+  });
+  const [text, setText] = useState(target.text);
   const [url, setUrl] = useState(href);
 
   function apply() {
     const link = normalizeUrl(url);
     if (!link) return;
-    const { empty } = editor.state.selection;
-    if (editor.isActive("link")) {
-      editor.chain().focus().extendMarkRange("link").setLink({ href: link }).run();
-    } else if (empty) {
-      editor.chain().focus().insertContent({ type: "text", text: url.trim(), marks: [{ type: "link", attrs: { href: link } }] }).run();
+    const label = text.trim() || url.trim();
+    const hasRange = target.range.from !== target.range.to;
+
+    if (hasRange && label === target.text.trim()) {
+      // same text as before -> just put/replace the link on it (keeps bold, colors, etc.)
+      editor.chain().focus().setTextSelection(target.range).setLink({ href: link }).run();
     } else {
-      editor.chain().focus().setLink({ href: link }).run();
+      // new or changed text -> write that text and make it the link
+      editor.chain().focus().insertContentAt(target.range, { type: "text", text: label, marks: [{ type: "link", attrs: { href: link } }] }).run();
     }
     close();
   }
 
+  const onEnter = (e: React.KeyboardEvent) => { if (e.key === "Enter") { e.preventDefault(); apply(); } };
+
   return (
     <div className="space-y-2">
       <p className="font-semibold">Link</p>
-      <input
-        autoFocus
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); apply(); } }}
-        placeholder="https://example.com"
-        className={field}
-      />
-      <div className="flex flex-wrap gap-2">
+      <label className="block text-xs text-zinc-500 dark:text-zinc-400">Text to show</label>
+      <input autoFocus={!target.text} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={onEnter} placeholder="e.g. Click here" className={field} />
+      <label className="block text-xs text-zinc-500 dark:text-zinc-400">Link (URL)</label>
+      <input autoFocus={!!target.text} value={url} onChange={(e) => setUrl(e.target.value)} onKeyDown={onEnter} placeholder="https://example.com" className={field} />
+      <div className="flex flex-wrap gap-2 pt-1">
         <button type="button" disabled={!url.trim()} onClick={apply} className={smallBtn}>
           {href ? "Update link" : "Add link"}
         </button>
@@ -240,7 +252,6 @@ function LinkPanel({ editor, close, href }: { editor: Editor; close: () => void;
           </button>
         )}
       </div>
-      <p className="text-xs text-zinc-500 dark:text-zinc-400">Select some text first, or just add the link to insert the URL as text.</p>
     </div>
   );
 }
