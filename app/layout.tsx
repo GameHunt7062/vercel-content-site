@@ -1,7 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { AdminProvider } from "@/components/admin/AdminProvider";
 import { getAdminUser } from "@/lib/admin";
 
@@ -52,9 +52,23 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
 
+  // "?v=2" forces browsers to re-download the icon (Chrome remembers an old/missing favicon for a long time)
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico?v=2", sizes: "any" },
+      { url: "/icon.png?v=2", type: "image/png", sizes: "48x48" },
+    ],
+    shortcut: "/favicon.ico?v=2",
+    apple: [{ url: "/apple-icon.png?v=2", sizes: "180x180", type: "image/png" }],
   },
+  applicationName: "RAWME",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
+  ],
 };
 
 export default async function RootLayout({
