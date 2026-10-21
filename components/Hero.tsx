@@ -1,15 +1,16 @@
 import './hero.css';
+import { HeroArtDesktop, HeroArtMobile } from "@/components/HeroArt";
+import HeroIntro from "@/components/HeroIntro";
 
 export default function Hero() {
   return (
     <section className="hero">
       <h1 className="sr-only">RAWME ARZU</h1>
-      <picture>
-        <source media="(max-aspect-ratio: 1/1)" srcSet="/hero-mobile.svg" />
-        <img className="hero-art" src="/hero-desktop.svg" alt="" />
-      </picture>
+      <HeroArtDesktop />
+      <HeroArtMobile />
       <span className="hero-dot hero-dot--tl" />
       <span className="hero-dot hero-dot--br" />
+      <HeroIntro />
     </section>
   );
 }

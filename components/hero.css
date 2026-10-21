@@ -8,6 +8,11 @@ body:has(.hero) :is(header,nav):not(.hero *){
 .hero{position:relative;width:100%;background:var(--rawme-blue);line-height:0}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .hero-art{display:block;width:100%;height:auto}
+.hero-art--mobile{display:none}
+@media (max-aspect-ratio:1/1){
+  .hero-art--desktop{display:none}
+  .hero-art--mobile{display:block}
+}
 
 /* pink dots sit above the navbar, half on the strip, half on the artwork */
 .hero-dot{position:absolute;z-index:60;width:6.4vw;aspect-ratio:1;border-radius:50%;background:var(--rawme-pink)}
@@ -20,12 +25,26 @@ body:has(.hero) :is(header,nav):not(.hero *){
   .hero-dot--br{right:5vw;bottom:3vw}
 }
 
-/* --- hero motion --- */
-@keyframes hero-in{from{opacity:0;scale:1.06}to{opacity:1;scale:1}}
+/* =====================================================================
+   HERO INTRO  (total ~3.2s - keep INTRO_MS in HeroIntro.tsx in sync)
+   1. character drops in from the top
+   2. R-A-W-M-E slide in from the left, one by one
+   3. ARZU rises from the bottom
+   4. pink dots pop in
+   ===================================================================== */
+@keyframes hl-move{from{transform:translate(var(--fx,0px),var(--fy,0px))}to{transform:translate(0,0)}}
 @keyframes dot-pop{0%{scale:0}70%{scale:1.15}100%{scale:1}}
 @keyframes dot-float{0%,100%{translate:0 0}50%{translate:0 -.9vw}}
 
-.hero-art{animation:hero-in 1.1s cubic-bezier(.22,1,.36,1) both}
-.hero-dot--tl{animation:dot-pop .8s cubic-bezier(.34,1.56,.64,1) .5s backwards,dot-float 5s ease-in-out 1.3s infinite}
-.hero-dot--br{animation:dot-pop .8s cubic-bezier(.34,1.56,.64,1) .7s backwards,dot-float 6s ease-in-out 1.5s infinite reverse}
+.hl{animation:hl-move 1s cubic-bezier(.22,1,.36,1) both}
+.hl-figure{animation-duration:1.15s;animation-delay:.1s;animation-timing-function:cubic-bezier(.34,1.3,.64,1)}
+.hl-letter{animation-duration:.7s;animation-delay:calc(.5s + var(--i) * .17s)}
+.hl-arzu{animation-duration:.9s;animation-delay:1.7s}
+
+.hero-dot--tl{animation:dot-pop .6s cubic-bezier(.34,1.56,.64,1) 2.4s backwards,dot-float 5s ease-in-out 3s infinite}
+.hero-dot--br{animation:dot-pop .6s cubic-bezier(.34,1.56,.64,1) 2.55s backwards,dot-float 6s ease-in-out 3.2s infinite reverse}
 @media (prefers-reduced-motion:reduce){.hero-dot--tl,.hero-dot--br{animation:none}}
+
+/* no scrolling until the intro has finished (also locked from the first paint, before JS loads) */
+@keyframes intro-unlock{0%,99.9%{overflow:hidden}100%{overflow:visible}}
+html:has(.hero){animation:intro-unlock 3.2s linear both}
