@@ -48,3 +48,15 @@ body:has(.hero) :is(header,nav):not(.hero *){
 /* no scrolling until the intro has finished (also locked from the first paint, before JS loads) */
 @keyframes intro-unlock{0%,99.9%{overflow:hidden}100%{overflow:visible}}
 html:has(.hero){animation:intro-unlock 3.2s linear both}
+
+/* =====================================================================
+   PARALLAX (scroll) - HeroParallax.tsx feeds --sy / --syu.
+   Each layer drifts at its own speed; the intro uses `transform`, parallax uses `translate`,
+   so the two never fight. Bigger number = lags more behind the page scroll.
+   ===================================================================== */
+.hl-figure{translate:0 calc(var(--syu,0) * 0.30px)}
+.hl-letter{translate:0 calc(var(--syu,0) * 0.14px)}
+.hl-arzu{translate:0 calc(var(--syu,0) * 0.06px)}
+.hero-dot--br{transform:translateY(calc(var(--sy,0) * -0.15px))}
+.hero-dot--tl{transform:translateY(calc(var(--sy,0) * 0.25px))}
+@media (prefers-reduced-motion:reduce){.hl-figure,.hl-letter,.hl-arzu{translate:none}.hero-dot--br,.hero-dot--tl{transform:none}}

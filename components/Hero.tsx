@@ -1,6 +1,7 @@
 import './hero.css';
 import { HeroArtDesktop, HeroArtMobile } from "@/components/HeroArt";
 import HeroIntro from "@/components/HeroIntro";
+import HeroParallax from "@/components/HeroParallax";
 
 export default function Hero() {
   return (
@@ -11,6 +12,7 @@ export default function Hero() {
       <span className="hero-dot hero-dot--tl" />
       <span className="hero-dot hero-dot--br" />
       <HeroIntro />
+      <HeroParallax />
     </section>
   );
 }
