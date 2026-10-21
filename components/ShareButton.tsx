@@ -40,7 +40,7 @@ export default function ShareButton({ title }: { title: string }) {
       type="button"
       onClick={share}
       aria-live="polite"
-      className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
+      className="rounded-lg border border-rawme-blue text-rawme-blue px-4 py-2 text-sm font-medium hover:bg-rawme-blue hover:text-white"
     >
       {copied ? "Link copied ✓" : "Share"}
     </button>

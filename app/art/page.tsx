@@ -14,7 +14,7 @@ export default async function Art() {
   }
 
   return <main className="max-w-6xl mx-auto px-6 py-12">
-    <h1 className="text-4xl font-black mb-8">Artwork</h1>
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">{(data ?? []).map(a => <ArtworkCard key={a.id} artwork={a}/>)}</div>
+    <h1 className="text-4xl font-black mb-8 text-rawme-blue">Artwork<span className="text-rawme-pink">.</span></h1>
+    <div className="stagger grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">{(data ?? []).map(a => <ArtworkCard key={a.id} artwork={a}/>)}</div>
   </main>;
 }

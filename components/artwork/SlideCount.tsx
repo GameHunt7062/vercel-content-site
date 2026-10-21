@@ -5,7 +5,7 @@ export default function SlideCount({ count }: { count?: number }) {
     <span
       aria-label={`${count} slides`}
       title={`${count} slides`}
-      className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-md bg-black/75 text-white text-xs font-semibold px-2 py-1 leading-none"
+      className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-md bg-rawme-blue/90 text-white text-xs font-semibold px-2 py-1 leading-none"
     >
       <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <rect x="8" y="8" width="13" height="13" rx="2" />

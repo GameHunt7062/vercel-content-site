@@ -11,7 +11,7 @@ export default function EditButton({ href, label }: { href: string; label: strin
     <AdminOnly>
       <button
         onClick={() => router.push(href)}
-        className="rounded-lg bg-black text-white px-4 py-2 text-sm font-medium hover:opacity-80"
+        className="rounded-lg bg-rawme-pink text-white px-4 py-2 text-sm font-medium hover:bg-rawme-blue"
       >
         {label}
       </button>
@@ -25,7 +25,7 @@ export function EditLink({ href }: { href: string }) {
     <AdminOnly>
       <Link
         href={href}
-        className="absolute top-2 right-2 z-10 rounded-md bg-black/80 text-white text-xs font-medium px-2.5 py-1 hover:bg-black"
+        className="absolute top-2 right-2 z-10 rounded-md bg-rawme-pink text-white text-xs font-medium px-2.5 py-1 hover:bg-rawme-blue"
       >
         Edit
       </Link>

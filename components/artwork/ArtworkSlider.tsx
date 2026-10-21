@@ -74,7 +74,7 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   if (count <= 1) {
-    return <img src={images[0]} alt={title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-zinc-100 dark:bg-zinc-800" />;
+    return <img src={images[0]} alt={title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-rawme-tint" />;
   }
 
   const slides = [images[count - 1], ...images, images[0]];
@@ -96,12 +96,12 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
     if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
   }
 
-  const arrow = "absolute top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/60 text-white text-xl hover:bg-black/80";
+  const arrow = "absolute top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-rawme-blue/80 text-white text-xl hover:bg-rawme-pink hover:scale-110";
 
   return (
     <div className="space-y-3" onKeyDown={onKeyDown}>
       <div
-        className="relative rounded-2xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden touch-pan-y focus:outline-none"
+        className="relative rounded-2xl bg-rawme-tint overflow-hidden touch-pan-y focus:outline-none"
         tabIndex={0}
         aria-roledescription="carousel"
         aria-label={`${title} — slide ${current} of ${count}`}
@@ -122,7 +122,7 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
         </div>
         <button type="button" aria-label="Previous slide" onClick={prev} className={`${arrow} left-3`}>‹</button>
         <button type="button" aria-label="Next slide" onClick={next} className={`${arrow} right-3`}>›</button>
-        <span className="absolute bottom-3 right-3 rounded-full bg-black/60 text-white text-xs px-2.5 py-1">{current} / {count}</span>
+        <span className="absolute bottom-3 right-3 rounded-full bg-rawme-blue/85 text-white text-xs px-2.5 py-1">{current} / {count}</span>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1">
@@ -132,7 +132,7 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
             type="button"
             onClick={() => moveTo(i + 1)}
             aria-label={`Go to slide ${i + 1}`}
-            className={`shrink-0 rounded-lg overflow-hidden ring-2 ${i + 1 === current ? "ring-black dark:ring-white" : "ring-transparent opacity-70 hover:opacity-100"}`}
+            className={`shrink-0 rounded-lg overflow-hidden ring-2 ${i + 1 === current ? "ring-rawme-pink" : "ring-transparent opacity-70 hover:opacity-100"}`}
           >
             <img src={src} alt="" className="h-16 w-16 object-cover" />
           </button>

@@ -16,10 +16,10 @@ export default async function Articles() {
   const { data } = await query;
 
   return <main className="max-w-5xl mx-auto px-6 py-12">
-    <h1 className="text-4xl font-black mb-8">Articles</h1>
-    <div className="grid md:grid-cols-2 gap-5">
+    <h1 className="text-4xl font-black mb-8 text-rawme-blue">Articles<span className="text-rawme-pink">.</span></h1>
+    <div className="stagger grid md:grid-cols-2 gap-5">
       {(data ?? []).map(a => <div key={a.id} className="relative">
-        <Link href={`/article/${a.slug}`} className="block bg-white dark:bg-zinc-900 border rounded-xl p-6 hover:shadow">
+        <Link href={`/article/${a.slug}`} className="card block bg-white border rounded-xl p-6">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">{a.status === "draft" && <span className="mr-2 rounded bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400">DRAFT</span>}{a.category}</p><h2 className="text-2xl font-bold mt-2">{a.title}</h2><PublishedDate date={a.published_at ?? a.created_at} prefix="" className="mt-1" /><p className="mt-2 text-zinc-600 dark:text-zinc-400">{a.excerpt}</p>
         </Link>
         <EditLink href={`/admin/articles/${a.id}`} />

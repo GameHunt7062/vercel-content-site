@@ -1,6 +1,5 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
-import { ThemeProvider } from "@/components/theme-provider";
 import type { Metadata, Viewport } from "next";
 import { AdminProvider } from "@/components/admin/AdminProvider";
 import { getAdminUser } from "@/lib/admin";
@@ -65,10 +64,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#18181b" },
-  ],
+  themeColor: "#0012ff",
 };
 
 export default async function RootLayout({
@@ -79,7 +75,7 @@ export default async function RootLayout({
   const admin = await getAdminUser();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link
           rel="stylesheet"
@@ -88,16 +84,10 @@ export default async function RootLayout({
       </head>
 
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-        >
-          <AdminProvider initialIsAdmin={!!admin}>
-            <Navbar />
-            {children}
-          </AdminProvider>
-        </ThemeProvider>
+        <AdminProvider initialIsAdmin={!!admin}>
+          <Navbar />
+          {children}
+        </AdminProvider>
       </body>
     </html>
   );
