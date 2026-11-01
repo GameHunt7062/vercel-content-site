@@ -65,6 +65,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0012ff",
+  colorScheme: "light", // opt out of browser auto-dark / force-dark
 };
 
 export default async function RootLayout({

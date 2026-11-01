@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* The site is light-only. Make `dark:` classes depend on a `.dark` class (which is never set)
+   instead of the visitor's OS/browser dark mode. Without this, phones/PCs in dark mode turned
+   cards, toolbars and buttons black while the text stayed dark -> unreadable. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* RAWME palette: blue #0012FF, pink #FF0085, white. Single light theme (no dark mode). */
 @theme {
   --color-rawme-blue: #0012ff;
