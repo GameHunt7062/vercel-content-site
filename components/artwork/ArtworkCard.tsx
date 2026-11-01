@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { EditLink } from "@/components/admin/EditButton";
 import SlideCount from "@/components/artwork/SlideCount";
+import { spanClass } from "@/lib/gridSpan";
 
 export default function ArtworkCard({ artwork }: { artwork: any }) {
   return (
-    <div className="relative mb-6 break-inside-avoid">
+    <div className={`relative ${spanClass(artwork.grid_span)}`}>
       <Link href={`/art/${artwork.slug}`} className="group block">
         <div className="relative">
           <div className="zoom-frame"><img src={artwork.image_url} alt={artwork.title} className="block h-auto w-full" /></div>

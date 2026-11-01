@@ -8,6 +8,7 @@ import DeleteButton from "@/components/admin/DeleteButton";
 import RichEditor, { type EditorChange } from "@/components/editor/RichEditor";
 import DateTimeField from "@/components/admin/DateTimeField";
 import { docHasContent, textToDoc } from "@/lib/richtext";
+import { MAX_SPAN, normalizeSpan } from "@/lib/gridSpan";
 
 type Slide = { key: string; url?: string; file?: File; preview: string };
 
@@ -21,6 +22,8 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
   const [desc, setDesc] = useState<EditorChange>({ json: initialDoc, text: artwork.description ?? "" });
   const [publishedAt, setPublishedAt] = useState<string>(artwork.published_at ?? artwork.created_at ?? "");
   const [category, setCategory] = useState<string>(artwork.category ?? "");
+  const savedSpan = normalizeSpan(artwork.grid_span);
+  const [gridSpan, setGridSpan] = useState<number>(savedSpan);
   const [slides, setSlides] = useState<Slide[]>(original.map((url) => ({ key: url, url, preview: url })));
   const [busy, setBusy] = useState(false);
 
@@ -69,20 +72,25 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
           images.push(url);
         }
       }
-      const { error } = await supabase
-        .from("artworks")
-        .update({
-          title: title.trim() || artwork.title,
-          description: hasDesc ? desc.text.trim() || null : null,
-          description_json: hasDesc ? desc.json : null,
-          published_at: publishedAt || artwork.published_at || artwork.created_at || new Date().toISOString(),
-          category: category.trim() || null,
-          image_url: images[0],
-          images,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", artwork.id);
-      if (error) throw new Error(error.message);
+      const payload: Record<string, any> = {
+        title: title.trim() || artwork.title,
+        description: hasDesc ? desc.text.trim() || null : null,
+        description_json: hasDesc ? desc.json : null,
+        published_at: publishedAt || artwork.published_at || artwork.created_at || new Date().toISOString(),
+        category: category.trim() || null,
+        image_url: images[0],
+        images,
+        updated_at: new Date().toISOString(),
+      };
+      // only sent when changed, so saving keeps working even before the SQL migration has been run
+      if (gridSpan !== savedSpan) payload.grid_span = gridSpan;
+      const { error } = await supabase.from("artworks").update(payload).eq("id", artwork.id);
+      if (error) {
+        if (/grid_span/i.test(error.message)) {
+          throw new Error("The size option needs a database column first. Run supabase/add-artwork-grid-span.sql in the Supabase SQL Editor, then save again.");
+        }
+        throw new Error(error.message);
+      }
 
       // slides you removed -> delete their files from Storage (best effort)
       await removeFromStorage(original.filter((u) => !images.includes(u)));
@@ -129,6 +137,29 @@ export default function ArtworkEditForm({ artwork }: { artwork: any }) {
         <RichEditor initialContent={initialDoc ?? undefined} minHeight={200} placeholder="Write about this artwork…" onChange={setDesc} />
       </div>
       <DateTimeField value={publishedAt} onChange={setPublishedAt} />
+
+      <div>
+        <p className="mb-2 text-sm font-semibold">Size on the Artwork page <span className="font-normal text-zinc-500 dark:text-zinc-400">(how many grid columns it crosses)</span></p>
+        <div className="flex flex-wrap gap-2">
+          {Array.from({ length: MAX_SPAN }, (_, i) => i + 1).map((v) => (
+            <button
+              key={v}
+              type="button"
+              disabled={busy}
+              onClick={() => setGridSpan(v)}
+              aria-pressed={gridSpan === v}
+              className={`px-4 py-2 border rounded-lg text-sm font-medium ${gridSpan === v ? "bg-black text-white border-black" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"}`}
+            >
+              {v} · {["Small", "Medium", "Large", "Full width"][v - 1]}
+            </button>
+          ))}
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-1.5 max-w-xs" aria-hidden="true">
+          <div className="h-10 rounded bg-rawme-blue" style={{ gridColumn: `span ${gridSpan}` }} />
+          {Array.from({ length: 8 - gridSpan }, (_, i) => <div key={i} className="h-10 rounded bg-rawme-tint" />)}
+        </div>
+        <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Desktop grid has 4 columns. On tablets the size is capped at 3 columns and on phones at 2.</p>
+      </div>
       <button disabled={busy} onClick={save} className="bg-black text-white rounded-lg px-5 py-3 disabled:opacity-50">
         {busy ? "Saving..." : "Save Changes"}
       </button>
