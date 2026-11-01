@@ -33,9 +33,9 @@ export default async function Home() {
 
       <section className="mt-16">
         <div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-rawme-blue">Artwork</h2><Link href="/art" className="link-grow text-rawme-pink font-medium">View all →</Link></div>
-        <div className="stagger grid grid-cols-2 md:grid-cols-3 gap-5">
-          {(artworks ?? []).map((a) => <div key={a.slug} className="relative">
-            <Link href={`/art/${a.slug}`} className="group block"><div className="relative"><div className="zoom-frame"><img src={a.image_url} alt={a.title} className="aspect-square w-full object-cover"/></div><SlideCount count={a.images?.length} /></div><h3 className="font-semibold mt-2 group-hover:text-rawme-pink">{a.title}</h3></Link>
+        <div className="stagger columns-2 md:columns-3 gap-5">
+          {(artworks ?? []).map((a) => <div key={a.slug} className="relative mb-5 break-inside-avoid">
+            <Link href={`/art/${a.slug}`} className="group block"><div className="relative"><div className="zoom-frame"><img src={a.image_url} alt={a.title} className="block h-auto w-full"/></div><SlideCount count={a.images?.length} /></div><h3 className="font-semibold mt-2 group-hover:text-rawme-pink">{a.title}</h3></Link>
             <EditLink href={`/admin/artwork/${a.id}`} />
           </div>)}
         </div>

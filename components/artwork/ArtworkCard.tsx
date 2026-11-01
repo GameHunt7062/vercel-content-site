@@ -4,10 +4,10 @@ import SlideCount from "@/components/artwork/SlideCount";
 
 export default function ArtworkCard({ artwork }: { artwork: any }) {
   return (
-    <div className="relative">
+    <div className="relative mb-6 break-inside-avoid">
       <Link href={`/art/${artwork.slug}`} className="group block">
         <div className="relative">
-          <div className="zoom-frame"><img src={artwork.image_url} alt={artwork.title} className="aspect-square w-full object-cover" /></div>
+          <div className="zoom-frame"><img src={artwork.image_url} alt={artwork.title} className="block h-auto w-full" /></div>
           <SlideCount count={artwork.images?.length} />
         </div>
         <h3 className="font-semibold mt-3 group-hover:text-rawme-pink">{artwork.title}</h3>
