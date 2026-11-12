@@ -22,7 +22,7 @@ export type ArtItem = {
 };
 
 const GAP_IN = 4; //      gap between slides of the SAME artwork (they sit side by side)
-const GAP_OUT = 24; //    minimum gap between different artworks
+const GAP_OUT = 10; //    minimum gap between different artworks
 const PANEL_W = 440;
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const slidesOf = (a: ArtItem) => (a.images?.length ? a.images : [a.image_url]);
@@ -159,7 +159,10 @@ export default function ArtCanvas({ artworks }: { artworks: ArtItem[] }) {
   return (
     <TvStage
       label="Artwork"
-      hint="drag to explore"
+      hint="scroll to zoom · drag to explore"
+      wheel="zoom"
+      minZoom={0.55}
+      maxZoom={2.6}
       items={ready ? items : []}
       period={ready ? period : null}
       renderItem={renderItem}

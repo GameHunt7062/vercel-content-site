@@ -85,7 +85,7 @@ export function scatterClusters(
   const n = sizes.length;
   if (!n) return { pos: [] as { x: number; y: number }[], pw: 1, ph: 1 };
   const { margin: m, seed, aspect = 1.5 } = opts;
-  let density = opts.density ?? 0.58;
+  let density = opts.density ?? 0.78;
 
   let area = 0, maxW = 0, maxH = 0;
   for (const s of sizes) {
@@ -95,7 +95,14 @@ export function scatterClusters(
   }
   const order = sizes.map((_, i) => i).sort((a, b) => sizes[b].w * sizes[b].h - sizes[a].w * sizes[a].h);
 
-  for (let attempt = 0; attempt < 40; attempt++, density *= 0.95) {
+  // distance between two rects (0 when touching/overlapping), on the repeating block
+  const dist = (ax: number, ay: number, a: { w: number; h: number }, bx: number, by: number, b: { w: number; h: number }) => {
+    const dx = Math.max(bx - (ax + a.w), ax - (bx + b.w), 0);
+    const dy = Math.max(by - (ay + a.h), ay - (by + b.h), 0);
+    return Math.hypot(dx, dy);
+  };
+
+  for (let attempt = 0; attempt < 60; attempt++, density *= 0.96) {
     const total = area / density;
     const pw = Math.max(Math.sqrt(total * aspect), maxW + 2 * m + 40);
     const ph = Math.max(total / Math.sqrt(total * aspect), maxH + 2 * m + 40);
@@ -106,11 +113,13 @@ export function scatterClusters(
 
     for (const i of order) {
       const a = sizes[i];
-      let found = false;
-      for (let t = 0; t < 700 && !found; t++) {
+      // try many random spots; among the free ones pick (one of) the tightest, so gaps stay small
+      const cands: { x: number; y: number; d: number }[] = [];
+      for (let t = 0; t < 900 && cands.length < 28; t++) {
         const x = rnd() * pw;
         const y = rnd() * ph;
         let hit = false;
+        let near = Infinity;
         for (const j of placed) {
           const b = sizes[j];
           const p = pos[j];
@@ -119,12 +128,17 @@ export function scatterClusters(
               const bx = p.x + ox * pw;
               const by = p.y + oy * ph;
               if (x < bx + b.w + m && x + a.w + m > bx && y < by + b.h + m && y + a.h + m > by) hit = true;
+              else near = Math.min(near, dist(x, y, a, bx, by, b));
             }
           if (hit) break;
         }
-        if (!hit) { pos[i] = { x, y }; placed.push(i); found = true; }
+        if (!hit) cands.push({ x, y, d: near });
       }
-      if (!found) { ok = false; break; }
+      if (!cands.length) { ok = false; break; }
+      cands.sort((u, v) => u.d - v.d);
+      const pick = cands[Math.floor(rnd() * Math.min(3, cands.length))];
+      pos[i] = { x: pick.x, y: pick.y };
+      placed.push(i);
     }
     if (ok) return { pos, pw, ph };
   }

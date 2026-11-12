@@ -24,12 +24,11 @@
   left: 0;
   top: 0;
   transform-origin: 0 0;
-  will-change: transform;
   backface-visibility: hidden;
   visibility: hidden; /* JS shows it once it has a transform */
 }
 
-/* old-TV glass: vignette + glare (no straight scanlines, they fight the curve) */
+/* old-TV glass: vignette + glare. Scanlines are drawn curved on a canvas (.tv-scan) */
 .tv-crt {
   position: absolute;
   inset: 0;
@@ -45,6 +44,16 @@
   inset: 0;
   background: rgba(110, 150, 255, 0.035);
   animation: tv-flicker 5s infinite steps(1);
+}
+/* curved red/blue/dark scanlines (drawn by TvStage) with a rare tiny glitch jump */
+.tv-scan {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  animation: tv-glitch 7s infinite steps(1);
 }
 /* rounded black corners = the tube's edge */
 .tv-bezel {
@@ -217,9 +226,17 @@
   to { opacity: 1; filter: none; }
 }
 @keyframes tv-panel-in { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes tv-glitch {
+  0%, 90%, 100% { transform: none; }
+  91% { transform: translate(3px, 0); }
+  92% { transform: translate(-2px, 1px); }
+  93% { transform: none; }
+  96% { transform: translate(2px, -1px); }
+  97% { transform: none; }
+}
 @keyframes tv-blink { 50% { opacity: 0.25; } }
 @keyframes tv-flicker { 0% { opacity: 1; } 47% { opacity: 0.6; } 50% { opacity: 1; } 91% { opacity: 0.8; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .tv-world, .tv-panel, .tv-crt::after, .tv-center { animation: none; }
+  .tv-world, .tv-panel, .tv-crt::after, .tv-center, .tv-scan { animation: none; }
 }

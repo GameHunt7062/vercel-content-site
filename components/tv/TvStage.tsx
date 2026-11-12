@@ -32,6 +32,10 @@ type Props = {
   curve?: number;
   /** mouse near a screen edge drifts the world that way (+ lens follows the mouse) */
   drift?: boolean;
+  /** what the mouse wheel does: move the world, or zoom (Google Maps style, toward the cursor) */
+  wheel?: "pan" | "zoom";
+  minZoom?: number;
+  maxZoom?: number;
   loading?: boolean;
   label: string;
   hint?: string;
@@ -52,6 +56,7 @@ const MAX_INSTS = 500;
 type Eng = {
   w: number; h: number;
   camX: number; camY: number; vx: number; vy: number; dX: number; dY: number;
+  z: number; zT: number; zAx: number; zAy: number;
   inset: number; insetT: number; lensX: number; lensY: number;
   mx: number; my: number; hover: boolean;
   drag: boolean; moved: boolean; pid: number;
@@ -91,17 +96,20 @@ const StageInst = memo(function StageInst({
 
 export default function TvStage({
   items, period = null, bounds = null, renderItem, insetLeft = 0, focusId = null,
-  curve = 0.35, drift = true, loading = false, label, hint, emptyText = "NO SIGNAL", children,
+  curve = 0.35, drift = true, wheel = "pan", minZoom = 1, maxZoom = 1,
+  loading = false, label, hint, emptyText = "NO SIGNAL", children,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const vpRef = useRef<HTMLDivElement>(null);
+  const scanRef = useRef<HTMLCanvasElement>(null);
   const els = useRef(new Map<string, HTMLElement>()).current;
   const instsRef = useRef<Inst[]>([]);
   const [insts, setInsts] = useState<Inst[]>([]);
 
-  const cfg = useRef({ items, period, bounds, curve, drift });
+  const cfg = useRef({ items, period, bounds, curve, drift, wheel, minZoom, maxZoom });
   const eng = useRef<Eng>({
     w: 0, h: 0, camX: 0, camY: 0, vx: 0, vy: 0, dX: 0, dY: 0,
+    z: 1, zT: 1, zAx: 0, zAy: 0,
     inset: insetLeft, insetT: insetLeft, lensX: 0, lensY: 0,
     mx: 0, my: 0, hover: false,
     drag: false, moved: false, pid: -1,
@@ -111,10 +119,10 @@ export default function TvStage({
   const api = useRef<{ kick: () => void; apply: () => void; flyTo: (id: string) => void; initCam: () => void } | null>(null);
 
   useLayoutEffect(() => {
-    cfg.current = { items, period, bounds, curve, drift };
+    cfg.current = { items, period, bounds, curve, drift, wheel, minZoom, maxZoom };
     api.current?.initCam();
     api.current?.kick();
-  }, [items, period, bounds, curve, drift]);
+  }, [items, period, bounds, curve, drift, wheel, minZoom, maxZoom]);
 
   useLayoutEffect(() => {
     api.current?.apply();
@@ -158,12 +166,11 @@ export default function TvStage({
     const collect = (g: Geom): Inst[] => {
       const { items: its, period: per } = cfg.current;
       const { w, h } = E;
-      const ox = E.camX - g.cx;
-      const oy = E.camY - g.cy;
-      const wx0 = g.lx - OVER * g.lx - PAD + ox;
-      const wx1 = g.lx + OVER * (w - g.lx) + PAD + ox;
-      const wy0 = g.ly - OVER * g.ly - PAD + oy;
-      const wy1 = g.ly + OVER * (h - g.ly) + PAD + oy;
+      const z = E.z;
+      const wx0 = (g.lx - OVER * g.lx - PAD - g.cx) / z + E.camX;
+      const wx1 = (g.lx + OVER * (w - g.lx) + PAD - g.cx) / z + E.camX;
+      const wy0 = (g.ly - OVER * g.ly - PAD - g.cy) / z + E.camY;
+      const wy1 = (g.ly + OVER * (h - g.ly) + PAD - g.cy) / z + E.camY;
       const out: Inst[] = [];
       for (const it of its) {
         let kx0 = 0, kx1 = 0, ky0 = 0, ky1 = 0;
@@ -189,12 +196,13 @@ export default function TvStage({
         const el = els.get(inst.key);
         if (!el) continue;
         const it = inst.item;
-        const x = it.x + (per ? inst.kx * per.w : 0) - E.camX + g.cx;
-        const y = it.y + (per ? inst.ky * per.h : 0) - E.camY + g.cy;
+        const z = E.z;
+        const x = (it.x + (per ? inst.kx * per.w : 0) - E.camX) * z + g.cx;
+        const y = (it.y + (per ? inst.ky * per.h : 0) - E.camY) * z + g.cy;
         const a = g.warp.fwd(x, y);
-        const b = g.warp.fwd(x + it.w, y);
-        const c = g.warp.fwd(x + it.w, y + it.h);
-        const d = g.warp.fwd(x, y + it.h);
+        const b = g.warp.fwd(x + it.w * z, y);
+        const c = g.warp.fwd(x + it.w * z, y + it.h * z);
+        const d = g.warp.fwd(x, y + it.h * z);
         const minX = Math.min(a[0], b[0], c[0], d[0]);
         const maxX = Math.max(a[0], b[0], c[0], d[0]);
         const minY = Math.min(a[1], b[1], c[1], d[1]);
@@ -208,6 +216,17 @@ export default function TvStage({
         el.style.transform = m;
         el.style.visibility = "visible";
       }
+    };
+
+    // zoom while keeping the world point under (ax, ay) exactly under it (works through the curve too)
+    const zoomAt = (ax: number, ay: number, z2: number) => {
+      const g = geom();
+      const s = g.warp.inv(ax, ay);
+      const wx = (s[0] - g.cx) / E.z + E.camX;
+      const wy = (s[1] - g.cy) / E.z + E.camY;
+      E.z = z2;
+      E.camX = wx - (s[0] - g.cx) / z2;
+      E.camY = wy - (s[1] - g.cy) / z2;
     };
 
     const sameInsts = (a: Inst[], b: Inst[]) =>
@@ -237,6 +256,12 @@ export default function TvStage({
       if (Math.abs(E.dY) < 0.5 && tdy === 0) E.dY = 0;
       if (E.dX || E.dY || tdx || tdy) active = true;
 
+      // smooth wheel zoom
+      if (Math.abs(E.zT - E.z) > 0.0004) {
+        zoomAt(E.zAx, E.zAy, E.z + (E.zT - E.z) * (1 - Math.exp(-dt * 10)));
+        active = true;
+      } else if (E.z !== E.zT) zoomAt(E.zAx, E.zAy, E.zT);
+
       if (E.drag) {
         active = true;
       } else if (E.fly) {
@@ -247,8 +272,8 @@ export default function TvStage({
         if (Math.hypot(E.fly.x - E.camX, E.fly.y - E.camY) < 0.6) { E.camX = E.fly.x; E.camY = E.fly.y; E.fly = null; }
         else active = true;
       } else {
-        E.camX += (E.vx + E.dX) * dt;
-        E.camY += (E.vy + E.dY) * dt;
+        E.camX += (E.vx + E.dX / E.z) * dt;
+        E.camY += (E.vy + E.dY / E.z) * dt;
         const dec = Math.exp(-FRICTION * dt);
         E.vx *= dec; E.vy *= dec;
         if (Math.hypot(E.vx, E.vy) < 6) E.vx = E.vy = 0;
@@ -303,16 +328,50 @@ export default function TvStage({
       kick();
     };
 
-    // ---- pointer: grab & drag with momentum --------------------------------------------
+    // ---- pointer: grab & drag with momentum, two fingers = pinch zoom -------------------
+    const ptrs = new Map<number, { x: number; y: number }>();
+    let pinch: { d0: number; z0: number; wx: number; wy: number } | null = null;
+    let pinched = false;
+    const mid = () => {
+      const [p, q] = [...ptrs.values()];
+      return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2, d: Math.hypot(p.x - q.x, p.y - q.y) };
+    };
+    const startPinch = () => {
+      const m = mid();
+      const g = geom();
+      const s = g.warp.inv(m.x, m.y);
+      pinch = {
+        d0: Math.max(10, m.d), z0: E.z,
+        wx: (s[0] - g.cx) / E.z + E.camX, wy: (s[1] - g.cy) / E.z + E.camY,
+      };
+      E.zT = E.z;
+      E.moved = true;
+      pinched = true;
+    };
+
     const onMove = (e: PointerEvent) => {
+      if (!ptrs.has(e.pointerId)) return;
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && ptrs.size >= 2) {
+        const m = mid();
+        const { minZoom: lo, maxZoom: hi } = cfg.current;
+        const z = clamp(pinch.z0 * (m.d / pinch.d0), lo, hi);
+        const g = geom();
+        const s = g.warp.inv(m.x, m.y);
+        E.z = E.zT = z;
+        E.camX = pinch.wx - (s[0] - g.cx) / z;
+        E.camY = pinch.wy - (s[1] - g.cy) / z;
+        kick();
+        return;
+      }
       if (!E.drag || e.pointerId !== E.pid) return;
       const g = geom();
       const a = g.warp.inv(E.px, E.py);
       const b = g.warp.inv(e.clientX, e.clientY);
       const now = performance.now();
       const dt = Math.max(1, now - E.pt) / 1000;
-      const mx = a[0] - b[0];
-      const my = a[1] - b[1];
+      const mx = (a[0] - b[0]) / E.z;
+      const my = (a[1] - b[1]) / E.z;
       E.camX += mx;
       E.camY += my;
       E.sv[0] = E.sv[0] * 0.6 + (mx / dt) * 0.4;
@@ -322,15 +381,25 @@ export default function TvStage({
       kick();
     };
     const onUp = (e: PointerEvent) => {
-      if (e.pointerId !== E.pid) return;
+      if (!ptrs.has(e.pointerId)) return;
+      ptrs.delete(e.pointerId);
+      if (ptrs.size === 1) {
+        // one finger left after a pinch: carry on dragging with it
+        pinch = null;
+        const [[id, p]] = [...ptrs.entries()];
+        E.pid = id; E.px = p.x; E.py = p.y; E.pt = performance.now(); E.sv = [0, 0];
+        return;
+      }
+      if (ptrs.size > 0) return;
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
+      pinch = null;
       E.drag = false;
       E.pid = -1;
       vp.classList.remove("is-grabbing");
       const idle = performance.now() - E.pt > 90;
-      if (E.moved && !idle) {
+      if (E.moved && !idle && !pinched) {
         const s = Math.hypot(E.sv[0], E.sv[1]);
         const f = s > MAX_V ? MAX_V / s : 1;
         E.vx = E.sv[0] * f;
@@ -339,17 +408,23 @@ export default function TvStage({
       kick();
     };
     const onDown = (e: PointerEvent) => {
-      if (E.drag) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      E.drag = true; E.moved = false; E.pid = e.pointerId;
-      E.fly = null; E.vx = E.vy = 0;
-      E.px = e.clientX; E.py = e.clientY; E.sx0 = e.clientX; E.sy0 = e.clientY;
-      E.pt = performance.now(); E.sv = [0, 0];
-      vp.classList.add("is-grabbing");
+      if (ptrs.size >= 2) return;
+      ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
       root.classList.add("tv-touched");
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
-      window.addEventListener("pointercancel", onUp);
+      if (ptrs.size === 1) {
+        E.drag = true; E.moved = false; E.pid = e.pointerId; pinched = false;
+        E.fly = null; E.vx = E.vy = 0;
+        E.px = e.clientX; E.py = e.clientY; E.sx0 = e.clientX; E.sy0 = e.clientY;
+        E.pt = performance.now(); E.sv = [0, 0];
+        vp.classList.add("is-grabbing");
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
+      } else {
+        E.fly = null;
+        startPinch();
+      }
       kick();
     };
 
@@ -366,9 +441,18 @@ export default function TvStage({
       e.preventDefault();
       const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? E.h : 1;
       E.fly = null;
-      E.vx += e.deltaX * k * FRICTION;
-      E.vy += e.deltaY * k * FRICTION;
       root.classList.add("tv-touched");
+      const c = cfg.current;
+      if (c.wheel === "zoom") {
+        // scroll = zoom toward the cursor (trackpad pinch arrives as ctrl+wheel, a bit finer)
+        const speed = e.ctrlKey ? 0.01 : 0.0016;
+        E.zT = clamp(E.zT * Math.exp(-e.deltaY * k * speed), c.minZoom, c.maxZoom);
+        E.zAx = e.clientX;
+        E.zAy = e.clientY;
+      } else {
+        E.vx += (e.deltaX * k * FRICTION) / E.z;
+        E.vy += (e.deltaY * k * FRICTION) / E.z;
+      }
       kick();
     };
 
@@ -425,6 +509,51 @@ export default function TvStage({
     api.current?.kick();
   }, [insetLeft]);
 
+  // CURVED scanlines: horizontal lines pushed through the same barrel lens, so they bend like the glass.
+  // Red / blue / dark lines in turn (thin + transparent) give the little RGB-glitch look.
+  useEffect(() => {
+    const cv = scanRef.current;
+    const root = rootRef.current;
+    if (!cv || !root) return;
+    const draw = () => {
+      const w = root.clientWidth;
+      const h = root.clientHeight;
+      if (!w || !h) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+      const ctx = cv.getContext("2d");
+      if (!ctx) return;
+      ctx.scale(dpr, dpr);
+      ctx.lineWidth = 1;
+      const warp = makeWarp(w / 2, h / 2, Math.hypot(w / 2, h / 2), curve, OVER);
+      const colors = ["rgba(255,40,80,0.11)", "rgba(50,120,255,0.11)", "rgba(0,0,0,0.18)", "rgba(0,0,0,0)"];
+      const SEG = 40;
+      const x0 = -0.4 * w;
+      const dx = (1.8 * w) / SEG;
+      let i = 0;
+      for (let y = -0.4 * h; y <= 1.4 * h; y += 3, i++) {
+        const col = colors[i % colors.length];
+        if (col.endsWith(",0)")) continue;
+        ctx.beginPath();
+        let any = false;
+        for (let k = 0; k <= SEG; k++) {
+          const p = warp.fwd(x0 + k * dx, y);
+          if (p[1] > -4 && p[1] < h + 4) any = true;
+          if (k === 0) ctx.moveTo(p[0], p[1]);
+          else ctx.lineTo(p[0], p[1]);
+        }
+        if (!any) continue;
+        ctx.strokeStyle = col;
+        ctx.stroke();
+      }
+    };
+    draw();
+    const ro = new ResizeObserver(draw);
+    ro.observe(root);
+    return () => ro.disconnect();
+  }, [curve]);
+
   const lastFocus = useRef<string | null>(null);
   useEffect(() => {
     if (focusId && focusId !== lastFocus.current) api.current?.flyTo(focusId);
@@ -445,6 +574,7 @@ export default function TvStage({
       {!loading && items.length === 0 && <div className="tv-osd tv-center">{emptyText}</div>}
 
       <div className="tv-crt" aria-hidden />
+      <canvas className="tv-scan" ref={scanRef} aria-hidden />
       <div className="tv-osd tv-channel" aria-hidden>
         <i /> {label}
       </div>
