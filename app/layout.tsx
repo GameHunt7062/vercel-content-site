@@ -1,5 +1,6 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import NavGate from "@/components/NavGate";
 import type { Metadata, Viewport } from "next";
 import { AdminProvider } from "@/components/admin/AdminProvider";
 import { getAdminUser } from "@/lib/admin";
@@ -86,7 +87,7 @@ export default async function RootLayout({
 
       <body>
         <AdminProvider initialIsAdmin={!!admin}>
-          <Navbar />
+          <NavGate><Navbar /></NavGate>
           {children}
         </AdminProvider>
       </body>

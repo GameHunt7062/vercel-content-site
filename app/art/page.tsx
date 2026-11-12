@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import ArtworkGrid from "@/components/artwork/ArtworkGrid";
+import ArtCanvas, { type ArtItem } from "@/components/artwork/ArtCanvas";
 
 export default async function Art() {
   const supabase = await createClient();
@@ -22,8 +22,19 @@ export default async function Art() {
     ({ data } = await supabase.from("artworks").select("*").order("created_at", { ascending: false }));
   }
 
-  return <main className="max-w-6xl mx-auto px-6 py-12">
-    <h1 className="text-4xl font-black mb-8 text-rawme-blue">Artwork<span className="text-rawme-pink">.</span></h1>
-    <ArtworkGrid artworks={data ?? []} />
-  </main>;
+  // only send what the canvas needs
+  const artworks: ArtItem[] = (data ?? []).map((a) => ({
+    id: a.id,
+    slug: a.slug,
+    title: a.title,
+    category: a.category ?? null,
+    image_url: a.image_url,
+    images: a.images ?? null,
+    description: a.description ?? null,
+    description_json: a.description_json ?? null,
+    published_at: a.published_at ?? null,
+    created_at: a.created_at,
+  }));
+
+  return <ArtCanvas artworks={artworks} />;
 }
