@@ -7,10 +7,10 @@ import PublishedDate from "@/components/PublishedDate";
 import ArticleViewer from "@/components/articles/ArticleViewer";
 import type { ArtItem } from "@/components/artwork/ArtCanvas";
 
-export default function ArtDetail({ art }: { art: ArtItem }) {
+export default function ArtDetail({ art, startIndex = 0 }: { art: ArtItem; startIndex?: number }) {
   const images = art.images?.length ? art.images : [art.image_url];
   const n = images.length;
-  const [i, setI] = useState(0);
+  const [i, setI] = useState(Math.min(Math.max(startIndex, 0), n - 1));
   const [zoom, setZoom] = useState(false);
   const [msg, setMsg] = useState("");
   const startX = useRef<number | null>(null);

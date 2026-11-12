@@ -6,7 +6,7 @@ import TvStage, { type StageItem } from "@/components/tv/TvStage";
 import TvPanel from "@/components/tv/TvPanel";
 import { useMediaQuery } from "@/components/tv/useMediaQuery";
 import ArtDetail from "@/components/artwork/ArtDetail";
-import { justifiedLayout } from "@/lib/tvLayout";
+import { hashString, justifiedLayout, scatterClusters, seededRandom } from "@/lib/tvLayout";
 
 export type ArtItem = {
   id: string;
@@ -21,39 +21,30 @@ export type ArtItem = {
   created_at: string;
 };
 
-const GAP = 6; // gap between pictures (px)
+const GAP_IN = 4; //      gap between slides of the SAME artwork (they sit side by side)
+const GAP_OUT = 24; //    minimum gap between different artworks
 const PANEL_W = 440;
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-const coverOf = (a: ArtItem) => a.images?.[0] || a.image_url;
+const slidesOf = (a: ArtItem) => (a.images?.length ? a.images : [a.image_url]);
+const tileId = (artId: string, idx: number) => `${artId}#${idx}`;
+
+type Tile = { art: ArtItem; idx: number; src: string };
 
 const ArtTile = memo(function ArtTile({
-  art, w, h, selected, onSelect,
+  tile, w, h, selected, onSelect,
 }: {
-  art: ArtItem; w: number; h: number; selected: boolean; onSelect: (id: string) => void;
+  tile: Tile; w: number; h: number; selected: boolean; onSelect: (artId: string, idx: number) => void;
 }) {
-  const n = art.images?.length ?? 1;
-  const depth = Math.min(Math.max(n - 1, 0), 2); // pictures with slides look like a little stack
-  const step = clamp(h * 0.03, 4, 8);
-  const cw = w - depth * step;
-  const ch = h - depth * step;
   return (
     <button
       type="button"
       className={`tv-tile${selected ? " is-sel" : ""}`}
-      onClick={() => onSelect(art.id)}
-      aria-label={art.title}
+      onClick={() => onSelect(tile.art.id, tile.idx)}
+      aria-label={tile.art.title}
     >
-      {Array.from({ length: depth }, (_, i) => depth - i).map((k) => (
-        <span
-          key={k}
-          className="tv-layer"
-          style={{ left: k * step, bottom: k * step, width: cw, height: ch, opacity: 1 - k * 0.2 }}
-        />
-      ))}
-      <span className="tv-card" style={{ width: cw, height: ch }}>
+      <span className="tv-card" style={{ width: w, height: h }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={coverOf(art)} alt="" draggable={false} decoding="async" />
-        {n > 1 && <span className="tv-count">{n}</span>}
+        <img src={tile.src} alt="" draggable={false} decoding="async" />
       </span>
     </button>
   );
@@ -81,54 +72,88 @@ export default function ArtCanvas({ artworks }: { artworks: ArtItem[] }) {
   const desktop = useMediaQuery("(min-width: 900px)");
   const [ratios, setRatios] = useState<Record<string, number>>({});
   const [ready, setReady] = useState(artworks.length === 0);
-  const [sel, setSel] = useState<string | null>(null);
+  const [sel, setSel] = useState<{ id: string; idx: number } | null>(null);
 
-  // we need every picture's real shape before we can lay them out (original ratio is kept)
+  // every slide of every artwork is its own tile, so we need each picture's real shape first
   useEffect(() => {
-    if (!artworks.length) return;
+    const all = artworks.flatMap((a) => slidesOf(a).map((src, idx) => ({ key: tileId(a.id, idx), src })));
+    if (!all.length) return;
     let alive = true;
     let late = false;
-    let left = artworks.length;
+    let left = all.length;
     const got: Record<string, number> = {};
     const flush = () => alive && setRatios({ ...got });
-    const timer = setTimeout(() => { late = true; flush(); if (alive) setReady(true); }, 4500);
-    artworks.forEach((a) => {
+    const timer = setTimeout(() => { late = true; flush(); if (alive) setReady(true); }, 8000);
+    all.forEach(({ key, src }) => {
       const im = new Image();
       im.decoding = "async";
       const fin = (r: number) => {
-        got[a.id] = clamp(r, 0.3, 3.5);
+        got[key] = clamp(r, 0.3, 3.5);
         left -= 1;
         if (late) flush();
         else if (left === 0) { clearTimeout(timer); flush(); if (alive) setReady(true); }
       };
       im.onload = () => fin(im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1);
       im.onerror = () => fin(1);
-      im.src = coverOf(a);
+      im.src = src;
     });
     return () => { alive = false; clearTimeout(timer); };
   }, [artworks]);
 
-  const layout = useMemo(() => {
-    const W = clamp(Math.round(vp.w * 1.6), 1000, 2200);
-    const target = clamp(Math.round((Math.min(vp.w, vp.h) * 0.42) / 10) * 10, 170, 280);
-    return justifiedLayout(artworks.map((a) => ratios[a.id] ?? 1), W, GAP, target);
+  // Layout: each artwork = a little cluster (all its slides side by side), clusters scattered randomly
+  const { items, period, tiles } = useMemo(() => {
+    const T = clamp(Math.round((Math.min(vp.w, vp.h) * 0.3) / 10) * 10, 140, 210);
+    const rnd = seededRandom(hashString(artworks.map((a) => a.id).join("|")));
+
+    const clusters = artworks.map((a) => {
+      const slides = slidesOf(a);
+      const s = 0.85 + rnd() * 0.4; // each artwork gets its own size
+      const r = slides.map((_, i) => ratios[tileId(a.id, i)] ?? 1);
+      const n = r.length;
+      const cols = n === 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : 4;
+      const avgW = (r.reduce((x, v) => x + T * s * Math.sqrt(v), 0) / n) || T;
+      const Wc = n === 1 ? T * s * Math.sqrt(r[0]) : cols * avgW + (cols - 1) * GAP_IN;
+      const lay = justifiedLayout(r, Wc, GAP_IN, T * s);
+      return { a, lay, w: Wc, h: lay.ph - GAP_IN };
+    });
+
+    const sc = scatterClusters(clusters.map((c) => ({ w: c.w, h: c.h })), {
+      seed: hashString(artworks.map((a) => a.id).join("|")) + 1,
+      margin: GAP_OUT,
+    });
+
+    const items: StageItem[] = [];
+    const tiles = new Map<string, Tile>();
+    clusters.forEach((c, i) => {
+      const slides = slidesOf(c.a);
+      c.lay.boxes.forEach((b, k) => {
+        const id = tileId(c.a.id, k);
+        items.push({ id, x: sc.pos[i].x + b.x, y: sc.pos[i].y + b.y, w: b.w, h: b.h });
+        tiles.set(id, { art: c.a, idx: k, src: slides[k] });
+      });
+    });
+    return { items, period: { w: sc.pw, h: sc.ph }, tiles };
   }, [artworks, ratios, vp]);
 
-  const items = useMemo<StageItem[]>(
-    () => layout.boxes.map((b, i) => ({ id: artworks[i].id, ...b })),
-    [layout, artworks],
-  );
-  const period = useMemo(() => ({ w: layout.pw, h: layout.ph }), [layout]);
   const byId = useMemo(() => new Map(artworks.map((a) => [a.id, a])), [artworks]);
-  const art = sel ? byId.get(sel) : undefined;
+  const art = sel ? byId.get(sel.id) : undefined;
   const close = useCallback(() => setSel(null), []);
+  const onSelect = useCallback((id: string, idx: number) => setSel({ id, idx }), []);
 
   const renderItem = useCallback(
     (item: StageItem) => {
-      const a = byId.get(item.id);
-      return a ? <ArtTile art={a} w={item.w} h={item.h} selected={sel === item.id} onSelect={setSel} /> : null;
+      const tile = tiles.get(item.id);
+      return tile ? (
+        <ArtTile
+          tile={tile}
+          w={item.w}
+          h={item.h}
+          selected={sel?.id === tile.art.id}
+          onSelect={onSelect}
+        />
+      ) : null;
     },
-    [byId, sel],
+    [tiles, sel?.id, onSelect],
   );
 
   return (
@@ -141,12 +166,12 @@ export default function ArtCanvas({ artworks }: { artworks: ArtItem[] }) {
       loading={!ready}
       emptyText="NO ARTWORK YET"
       insetLeft={art && desktop ? PANEL_W : 0}
-      focusId={sel}
+      focusId={sel ? tileId(sel.id, sel.idx) : null}
       curve={0.35}
     >
-      {art && (
+      {art && sel && (
         <TvPanel width={desktop ? PANEL_W : null} onClose={close} label={art.title}>
-          <ArtDetail key={art.id} art={art} />
+          <ArtDetail key={`${art.id}:${sel.idx}`} art={art} startIndex={sel.idx} />
         </TvPanel>
       )}
       <nav className="tv-sr" aria-label="All artwork">

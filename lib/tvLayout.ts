@@ -54,3 +54,86 @@ export function gridLayout(n: number, cols: number, w: number, h: number, gap: n
   const bounds: Box = { x: 0, y: 0, w: Math.min(n, cols) * (w + gap) - gap, h: rows * (h + gap) - gap };
   return { boxes, bounds };
 }
+
+/** small seeded random generator so the "random" arrangement is the same on every visit */
+export function seededRandom(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function hashString(s: string) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
+/**
+ * Scatter rectangles (clusters) at random spots of an endless, repeating block (a torus), without
+ * overlapping each other (also not across the repeat edges). Starts with a loose block and grows it a
+ * little if everything does not fit. Returns top-left position per cluster and the block size.
+ */
+export function scatterClusters(
+  sizes: { w: number; h: number }[],
+  opts: { seed: number; margin: number; density?: number; aspect?: number },
+) {
+  const n = sizes.length;
+  if (!n) return { pos: [] as { x: number; y: number }[], pw: 1, ph: 1 };
+  const { margin: m, seed, aspect = 1.5 } = opts;
+  let density = opts.density ?? 0.58;
+
+  let area = 0, maxW = 0, maxH = 0;
+  for (const s of sizes) {
+    area += (s.w + m) * (s.h + m);
+    maxW = Math.max(maxW, s.w);
+    maxH = Math.max(maxH, s.h);
+  }
+  const order = sizes.map((_, i) => i).sort((a, b) => sizes[b].w * sizes[b].h - sizes[a].w * sizes[a].h);
+
+  for (let attempt = 0; attempt < 40; attempt++, density *= 0.95) {
+    const total = area / density;
+    const pw = Math.max(Math.sqrt(total * aspect), maxW + 2 * m + 40);
+    const ph = Math.max(total / Math.sqrt(total * aspect), maxH + 2 * m + 40);
+    const rnd = seededRandom(seed + attempt * 977);
+    const pos: { x: number; y: number }[] = new Array(n);
+    const placed: number[] = [];
+    let ok = true;
+
+    for (const i of order) {
+      const a = sizes[i];
+      let found = false;
+      for (let t = 0; t < 700 && !found; t++) {
+        const x = rnd() * pw;
+        const y = rnd() * ph;
+        let hit = false;
+        for (const j of placed) {
+          const b = sizes[j];
+          const p = pos[j];
+          for (let ox = -1; ox <= 1 && !hit; ox++)
+            for (let oy = -1; oy <= 1 && !hit; oy++) {
+              const bx = p.x + ox * pw;
+              const by = p.y + oy * ph;
+              if (x < bx + b.w + m && x + a.w + m > bx && y < by + b.h + m && y + a.h + m > by) hit = true;
+            }
+          if (hit) break;
+        }
+        if (!hit) { pos[i] = { x, y }; placed.push(i); found = true; }
+      }
+      if (!found) { ok = false; break; }
+    }
+    if (ok) return { pos, pw, ph };
+  }
+  // last resort (should never happen): lay them out in a simple grid
+  const cols = Math.ceil(Math.sqrt(n));
+  const cw = maxW + m, ch = maxH + m;
+  return {
+    pos: sizes.map((_, i) => ({ x: (i % cols) * cw, y: Math.floor(i / cols) * ch })),
+    pw: cols * cw,
+    ph: Math.ceil(n / cols) * ch,
+  };
+}
