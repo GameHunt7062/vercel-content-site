@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 /** Pages that are full-screen "TV" scenes and must not show the site navigation bar. */
-const HIDE_ON = ["/art", "/articles", "/article"];
+const HIDE_ON = ["/art", "/article"];
 
 export default function NavGate({ children }: { children: ReactNode }) {
   const path = (usePathname() || "/").replace(/\/+$/, "") || "/";

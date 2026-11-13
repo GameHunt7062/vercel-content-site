@@ -2,7 +2,7 @@ import Link from "next/link";
 import "@/components/articles/articles.css";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminUser } from "@/lib/admin";
-import ArticlesBar from "@/components/articles/ArticlesBar";
+import Hero from "@/components/Hero";
 
 type Row = {
   id: string;
@@ -56,12 +56,16 @@ export default async function Articles() {
 
   return (
     <div className="arts-page">
-      <ArticlesBar />
+      <div className="arts-hero" aria-hidden>
+        <Hero />
+      </div>
       <main className="arts-wrap">
-        <h1 className="arts-title">Articles</h1>
-        {articles.length > 0 && (
-          <p className="arts-count">{articles.length} {articles.length === 1 ? "article" : "articles"}</p>
-        )}
+        <div className="arts-head">
+          <h1 className="arts-title">Articles</h1>
+          {articles.length > 0 && (
+            <p className="arts-count">{articles.length} {articles.length === 1 ? "article" : "articles"}</p>
+          )}
+        </div>
 
         {articles.length === 0 ? (
           <p className="arts-empty">No articles yet.</p>
@@ -70,7 +74,7 @@ export default async function Articles() {
             {articles.map((a) => {
               const [bg, fg] = a.category ? pill(a.category) : ["", ""];
               return (
-                <article key={a.id} className="arts-card">
+                <article key={a.id} className="card arts-card">
                   {a.cover_image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={a.cover_image} alt="" className="arts-cover" loading="lazy" />
