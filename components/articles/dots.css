@@ -1,0 +1,21 @@
+/* ===== pink balls on the top corners, above the navbar (/articles + all /article/... pages) =====
+   Size / position: change --dot (ball size). Each ball is centred on its page corner, so a quarter of it shows. */
+.art-dots {
+  --dot: clamp(40px, 5vw, 96px);
+  position: absolute; top: 0; left: 0; right: 0; height: var(--dot);
+  overflow: hidden;            /* the half of each ball that sits outside the screen must not cause sideways scrolling */
+  z-index: 60;                 /* above the navbar */
+  pointer-events: none;        /* never block clicks on the navbar links / back arrow underneath */
+}
+.art-dot {
+  position: absolute; top: calc(var(--dot) / -2);
+  width: var(--dot); aspect-ratio: 1; border-radius: 50%;
+  background: var(--rawme-pink, #ff0085);
+}
+.art-dot--l { left: calc(var(--dot) / -2);  animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .15s backwards, art-dot-float 5s ease-in-out 1s infinite; }
+.art-dot--r { right: calc(var(--dot) / -2); animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .3s backwards,  art-dot-float 6s ease-in-out 1.2s infinite reverse; }
+
+@keyframes art-dot-pop   { 0% { scale: 0; } 70% { scale: 1.15; } 100% { scale: 1; } }
+@keyframes art-dot-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+
+@media (prefers-reduced-motion: reduce) { .art-dot--l, .art-dot--r { animation: none; } }

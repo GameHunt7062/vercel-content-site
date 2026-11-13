@@ -2,7 +2,7 @@ import Link from "next/link";
 import "@/components/articles/articles.css";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminUser } from "@/lib/admin";
-import Hero from "@/components/Hero";
+import ArticleDots from "@/components/articles/ArticleDots";
 
 type Row = {
   id: string;
@@ -56,9 +56,7 @@ export default async function Articles() {
 
   return (
     <div className="arts-page">
-      <div className="arts-hero" aria-hidden>
-        <Hero />
-      </div>
+      <ArticleDots />
       <main className="arts-wrap">
         <div className="arts-head">
           <h1 className="arts-title">Articles</h1>
