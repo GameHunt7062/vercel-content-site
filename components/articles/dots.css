@@ -1,18 +1,19 @@
-/* ===== pink balls: fixed to the screen corners, they never scroll (/articles + all /article/... pages) =====
-   Same size as the home-page hero dots (components/hero.css), drawn ABOVE the navbar.
-   tl = centred on the top-left corner of the screen, br = bottom-right corner of the screen. */
+/* ===== pink balls: same size + place as the home-page hero dots (components/hero.css), but position:fixed so they never scroll =====
+   tl = on the line under the navbar (navbar is h-16 = 4rem), half on the navbar, half on the page, drawn ABOVE the navbar
+   br = bottom-right corner of the screen
+   Used on /articles and all /article/... pages. */
 .art-dot {
   position: fixed; z-index: 60;         /* fixed = stays on the screen corner while scrolling; above the navbar */
   width: 6.4vw; aspect-ratio: 1; border-radius: 50%;
   background: var(--rawme-pink, #ff0085);
   pointer-events: none;                 /* never block clicks underneath */
 }
-.art-dot--tl { left: -3.2vw; top: -3.2vw; animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .15s backwards, art-dot-float 5s ease-in-out 1s infinite; }
+.art-dot--tl { left: -3.2vw; top: calc(4rem - 3.2vw); animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .15s backwards, art-dot-float 5s ease-in-out 1s infinite; }
 .art-dot--br { right: 1.7vw; bottom: 1.4vw; animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .3s backwards, art-dot-float 6s ease-in-out 1.2s infinite reverse; }
 
 @media (max-aspect-ratio: 1/1) {
   .art-dot { width: 13vw; }
-  .art-dot--tl { left: -6.5vw; top: -6.5vw; }
+  .art-dot--tl { left: -6.5vw; top: calc(4rem - 6.5vw); }
   .art-dot--br { right: 5vw; bottom: 3vw; }
 }
 
