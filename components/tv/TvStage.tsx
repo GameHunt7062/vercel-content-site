@@ -13,7 +13,8 @@ import {
 } from "react";
 import { makeWarp, quadToMatrix3d, type Warp } from "@/lib/tvWarp";
 
-export type StageItem = { id: string; x: number; y: number; w: number; h: number };
+/** `fixed` items stay where they are on the screen (a sidebar); they still bend with the glass. x/y are screen px. */
+export type StageItem = { id: string; x: number; y: number; w: number; h: number; fixed?: boolean };
 type Inst = { key: string; item: StageItem; kx: number; ky: number };
 type Rect = { x: number; y: number; w: number; h: number };
 
@@ -36,6 +37,24 @@ type Props = {
   wheel?: "pan" | "zoom";
   minZoom?: number;
   maxZoom?: number;
+  /** left screen strip (px) that holds `fixed` items; the wheel scrolls THAT list while the mouse is over it */
+  fixedWidth?: number;
+  /** total height of the fixed list (so it can scroll when longer than the screen) */
+  fixedHeight?: number;
+  /** scroll the fixed list so this box (e.g. the active sidebar entry) is visible */
+  fixedReveal?: { y: number; h: number } | null;
+  /** false = the mouse does not drag the world (so text can be selected); touch still drags */
+  mouseDrag?: boolean;
+  /** allow selecting text inside tiles */
+  selectable?: boolean;
+  /** arrow keys / space / page up-down / home / end scroll the world */
+  keys?: boolean;
+  /** first view = top-left of `bounds` (a document) instead of its centre */
+  startAtTop?: boolean;
+  /** when this changes the camera goes back to the start */
+  resetKey?: string;
+  /** thin scroll-position bar on the right edge (needs `bounds`) */
+  progress?: boolean;
   loading?: boolean;
   label: string;
   hint?: string;
@@ -56,7 +75,7 @@ const MAX_INSTS = 500;
 type Eng = {
   w: number; h: number;
   camX: number; camY: number; vx: number; vy: number; dX: number; dY: number;
-  z: number; zT: number; zAx: number; zAy: number;
+  z: number; zT: number; zAx: number; zAy: number; fy: number;
   inset: number; insetT: number; lensX: number; lensY: number;
   mx: number; my: number; hover: boolean;
   drag: boolean; moved: boolean; pid: number;
@@ -97,6 +116,8 @@ const StageInst = memo(function StageInst({
 export default function TvStage({
   items, period = null, bounds = null, renderItem, insetLeft = 0, focusId = null,
   curve = 0.35, drift = true, wheel = "pan", minZoom = 1, maxZoom = 1,
+  fixedWidth = 0, fixedHeight = 0, fixedReveal = null, mouseDrag = true, selectable = false,
+  keys = false, startAtTop = false, resetKey = "", progress = false,
   loading = false, label, hint, emptyText = "NO SIGNAL", children,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -106,23 +127,33 @@ export default function TvStage({
   const instsRef = useRef<Inst[]>([]);
   const [insts, setInsts] = useState<Inst[]>([]);
 
-  const cfg = useRef({ items, period, bounds, curve, drift, wheel, minZoom, maxZoom });
+  const cfg = useRef({
+    items, period, bounds, curve, drift, wheel, minZoom, maxZoom,
+    fixedWidth, fixedHeight, mouseDrag, keys, startAtTop, progress,
+  });
   const eng = useRef<Eng>({
     w: 0, h: 0, camX: 0, camY: 0, vx: 0, vy: 0, dX: 0, dY: 0,
-    z: 1, zT: 1, zAx: 0, zAy: 0,
+    z: 1, zT: 1, zAx: 0, zAy: 0, fy: 0,
     inset: insetLeft, insetT: insetLeft, lensX: 0, lensY: 0,
     mx: 0, my: 0, hover: false,
     drag: false, moved: false, pid: -1,
     px: 0, py: 0, pt: 0, sx0: 0, sy0: 0, sv: [0, 0],
     fly: null, raf: 0, last: 0, init: false,
   });
-  const api = useRef<{ kick: () => void; apply: () => void; flyTo: (id: string) => void; initCam: () => void } | null>(null);
+  const api = useRef<{ kick: () => void; apply: () => void; flyTo: (id: string) => void; initCam: () => void; reset: () => void } | null>(null);
 
   useLayoutEffect(() => {
-    cfg.current = { items, period, bounds, curve, drift, wheel, minZoom, maxZoom };
+    cfg.current = {
+      items, period, bounds, curve, drift, wheel, minZoom, maxZoom,
+      fixedWidth, fixedHeight, mouseDrag, keys, startAtTop, progress,
+    };
     api.current?.initCam();
     api.current?.kick();
-  }, [items, period, bounds, curve, drift, wheel, minZoom, maxZoom]);
+  }, [items, period, bounds, curve, drift, wheel, minZoom, maxZoom, fixedWidth, fixedHeight, mouseDrag, keys, startAtTop, progress]);
+
+  useLayoutEffect(() => {
+    api.current?.reset();
+  }, [resetKey]);
 
   useLayoutEffect(() => {
     api.current?.apply();
@@ -157,6 +188,7 @@ export default function TvStage({
       const { items: its, period: per, bounds: bnd } = cfg.current;
       if (!its.length) return;
       if (per) { E.camX = per.w / 2; E.camY = per.h / 2; }
+      else if (bnd && cfg.current.startAtTop) { E.camX = bnd.x; E.camY = bnd.y; }
       else if (bnd) { E.camX = bnd.x + bnd.w / 2; E.camY = bnd.y + bnd.h / 2; }
       else { E.camX = its[0].x + its[0].w / 2; E.camY = its[0].y + its[0].h / 2; }
       E.init = true;
@@ -173,6 +205,7 @@ export default function TvStage({
       const wy1 = (g.ly + OVER * (h - g.ly) + PAD - g.cy) / z + E.camY;
       const out: Inst[] = [];
       for (const it of its) {
+        if (it.fixed) { out.push({ key: `${it.id}~0~0`, item: it, kx: 0, ky: 0 }); continue; }
         let kx0 = 0, kx1 = 0, ky0 = 0, ky1 = 0;
         if (per) {
           kx0 = Math.ceil((wx0 - it.x - it.w) / per.w);
@@ -196,9 +229,9 @@ export default function TvStage({
         const el = els.get(inst.key);
         if (!el) continue;
         const it = inst.item;
-        const z = E.z;
-        const x = (it.x + (per ? inst.kx * per.w : 0) - E.camX) * z + g.cx;
-        const y = (it.y + (per ? inst.ky * per.h : 0) - E.camY) * z + g.cy;
+        const z = it.fixed ? 1 : E.z;
+        const x = it.fixed ? it.x : (it.x + (per ? inst.kx * per.w : 0) - E.camX) * z + g.cx;
+        const y = it.fixed ? it.y + E.fy : (it.y + (per ? inst.ky * per.h : 0) - E.camY) * z + g.cy;
         const a = g.warp.fwd(x, y);
         const b = g.warp.fwd(x + it.w * z, y);
         const c = g.warp.fwd(x + it.w * z, y + it.h * z);
@@ -285,6 +318,10 @@ export default function TvStage({
         const ny = clamp(E.camY, bnd.y, bnd.y + bnd.h);
         if (nx !== E.camX) { E.camX = nx; E.vx = 0; E.dX = 0; }
         if (ny !== E.camY) { E.camY = ny; E.vy = 0; E.dY = 0; }
+      }
+
+      if (cfg.current.progress && bnd && !per) {
+        root.style.setProperty("--tv-prog", String(bnd.h > 0 ? clamp((E.camY - bnd.y) / bnd.h, 0, 1) : 0));
       }
 
       // lens follows the mouse a little
@@ -408,7 +445,7 @@ export default function TvStage({
       kick();
     };
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.pointerType === "mouse" && (e.button !== 0 || !cfg.current.mouseDrag)) return;
       if (ptrs.size >= 2) return;
       ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
       root.classList.add("tv-touched");
@@ -443,6 +480,12 @@ export default function TvStage({
       E.fly = null;
       root.classList.add("tv-touched");
       const c = cfg.current;
+      if (c.fixedWidth && e.clientX < c.fixedWidth) {
+        // mouse is over the fixed sidebar: scroll that list only
+        E.fy = clamp(E.fy - e.deltaY * k, Math.min(0, E.h - c.fixedHeight), 0);
+        kick();
+        return;
+      }
       if (c.wheel === "zoom") {
         // scroll = zoom toward the cursor (trackpad pinch arrives as ctrl+wheel, a bit finer)
         const speed = e.ctrlKey ? 0.01 : 0.0016;
@@ -466,6 +509,35 @@ export default function TvStage({
     };
     const noDrag = (e: Event) => e.preventDefault();
 
+    const onKey = (e: KeyboardEvent) => {
+      const c = cfg.current;
+      if (!c.keys || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (t && /^(BUTTON|A|SUMMARY)$/.test(t.tagName) && (e.key === " " || e.key === "Enter")) return;
+      const page = E.h * 0.85;
+      let dy = 0;
+      if (e.key === "ArrowDown") dy = 90;
+      else if (e.key === "ArrowUp") dy = -90;
+      else if (e.key === "PageDown") dy = page;
+      else if (e.key === "PageUp") dy = -page;
+      else if (e.key === " ") dy = e.shiftKey ? -page : page;
+      else if (e.key === "Home" || e.key === "End") {
+        const b = c.bounds;
+        if (!b) return;
+        E.fly = { x: E.camX, y: e.key === "Home" ? b.y : b.y + b.h };
+        E.vx = E.vy = 0;
+        e.preventDefault();
+        kick();
+        return;
+      } else return;
+      e.preventDefault();
+      E.fly = null;
+      E.vy += (dy * FRICTION) / E.z;
+      kick();
+    };
+    window.addEventListener("keydown", onKey);
+
     const measure = () => {
       E.w = vp.clientWidth;
       E.h = vp.clientHeight;
@@ -482,7 +554,16 @@ export default function TvStage({
     vp.addEventListener("click", onClickCapture, true);
     vp.addEventListener("dragstart", noDrag);
 
-    api.current = { kick, apply, flyTo, initCam };
+    const reset = () => {
+      E.init = false;
+      E.vx = E.vy = E.dX = E.dY = 0;
+      E.fly = null;
+      E.fy = 0;
+      initCam();
+      kick();
+    };
+
+    api.current = { kick, apply, flyTo, initCam, reset };
     measure();
 
     return () => {
@@ -496,6 +577,7 @@ export default function TvStage({
       vp.removeEventListener("wheel", onWheel);
       vp.removeEventListener("click", onClickCapture, true);
       vp.removeEventListener("dragstart", noDrag);
+      window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
@@ -554,6 +636,15 @@ export default function TvStage({
     return () => ro.disconnect();
   }, [curve]);
 
+  useEffect(() => {
+    const E = eng.current;
+    if (!fixedReveal || !fixedWidth || !E.h) return;
+    const top = fixedReveal.y;
+    const bot = top + fixedReveal.h;
+    if (top < -E.fy || bot > -E.fy + E.h) E.fy = clamp(-(top - 96), Math.min(0, E.h - fixedHeight), 0);
+    api.current?.kick();
+  }, [fixedReveal, fixedWidth, fixedHeight]);
+
   const lastFocus = useRef<string | null>(null);
   useEffect(() => {
     if (focusId && focusId !== lastFocus.current) api.current?.flyTo(focusId);
@@ -562,7 +653,7 @@ export default function TvStage({
 
   return (
     <div className="tv-root" ref={rootRef}>
-      <div className="tv-viewport" ref={vpRef} role="region" aria-label={label}>
+      <div className={`tv-viewport${selectable ? " is-selectable" : ""}`} ref={vpRef} role="region" aria-label={label}>
         <div className="tv-world">
           {insts.map((i) => (
             <StageInst key={i.key} k={i.key} item={i.item} els={els} render={renderItem} />
@@ -579,6 +670,12 @@ export default function TvStage({
         <i /> {label}
       </div>
       {hint && <div className="tv-osd tv-hint" aria-hidden>{hint}</div>}
+
+      {progress && (
+        <div className="tv-prog" aria-hidden>
+          <i />
+        </div>
+      )}
 
       {children}
 
