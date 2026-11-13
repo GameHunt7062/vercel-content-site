@@ -1,10 +1,11 @@
 /* ===== /articles : site navbar on top, plain white page with a very light gradient (no hero artwork) ===== */
 .arts-page {
+  position: relative;            /* the pink balls (ArticleDots) anchor to this */
   min-height: 100vh;
   background: linear-gradient(180deg, #ffffff 0%, #f6f7ff 55%, var(--color-rawme-tint, #eef0ff) 100%);
 }
 
-.arts-wrap { position: relative; max-width: 72rem; margin: 0 auto; padding: 4rem 1.5rem 6rem; } /* = max-w-6xl px-6 py-16 */
+.arts-wrap { position: relative; max-width: 72rem; margin: 0 auto; padding: 4rem 1.5rem max(6rem, 10vw); } /* = max-w-6xl px-6 py-16 */
 .arts-head { display: inline-block; margin-bottom: 2rem; padding: 0.6rem 1.25rem; }
 .arts-title { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: var(--rawme-blue, #0012ff); } /* same as "Latest Articles" */
 .arts-count { font-size: 0.8rem; color: #71717a; }

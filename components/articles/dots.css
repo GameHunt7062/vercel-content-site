@@ -1,21 +1,25 @@
-/* ===== pink balls on the top corners, above the navbar (/articles + all /article/... pages) =====
-   Size / position: change --dot (ball size). Each ball is centred on its page corner, so a quarter of it shows. */
-.art-dots {
-  --dot: clamp(40px, 5vw, 96px);
-  position: absolute; top: 0; left: 0; right: 0; height: var(--dot);
-  overflow: hidden;            /* the half of each ball that sits outside the screen must not cause sideways scrolling */
-  z-index: 60;                 /* above the navbar */
-  pointer-events: none;        /* never block clicks on the navbar links / back arrow underneath */
-}
+/* ===== pink balls = same size/position as the home-page hero dots (components/hero.css) =====
+   tl: top-left, centred on the line between the navbar and the page, drawn ABOVE the navbar
+   br: bottom-right of the page
+   The parent (.arts-page / .art-dots-root) is position:relative and starts right under the navbar. */
+.art-dots-root { position: relative; }
+
 .art-dot {
-  position: absolute; top: calc(var(--dot) / -2);
-  width: var(--dot); aspect-ratio: 1; border-radius: 50%;
+  position: absolute; z-index: 60;      /* above the navbar */
+  width: 6.4vw; aspect-ratio: 1; border-radius: 50%;
   background: var(--rawme-pink, #ff0085);
+  pointer-events: none;                 /* never block clicks underneath */
 }
-.art-dot--l { left: calc(var(--dot) / -2);  animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .15s backwards, art-dot-float 5s ease-in-out 1s infinite; }
-.art-dot--r { right: calc(var(--dot) / -2); animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .3s backwards,  art-dot-float 6s ease-in-out 1.2s infinite reverse; }
+.art-dot--tl { left: -3.2vw; top: -3.2vw; animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .15s backwards, art-dot-float 5s ease-in-out 1s infinite; }
+.art-dot--br { right: 1.7vw; bottom: 1.4vw; animation: art-dot-pop .6s cubic-bezier(.34, 1.56, .64, 1) .3s backwards, art-dot-float 6s ease-in-out 1.2s infinite reverse; }
+
+@media (max-aspect-ratio: 1/1) {
+  .art-dot { width: 13vw; }
+  .art-dot--tl { left: -6.5vw; top: -6.5vw; }
+  .art-dot--br { right: 5vw; bottom: 3vw; }
+}
 
 @keyframes art-dot-pop   { 0% { scale: 0; } 70% { scale: 1.15; } 100% { scale: 1; } }
-@keyframes art-dot-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes art-dot-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -.9vw; } }
 
-@media (prefers-reduced-motion: reduce) { .art-dot--l, .art-dot--r { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .art-dot--tl, .art-dot--br { animation: none; } }
