@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { articleMetadata, getArticleBySlug, getArticleList } from "@/lib/articleDocs";
-import ArticleDocs from "@/components/articles/ArticleDocs";
+import ArticleView from "@/components/articles/ArticleView";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -13,5 +13,5 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const [article, list] = await Promise.all([getArticleBySlug(slug), getArticleList()]);
   if (!article) notFound();
-  return <ArticleDocs articles={list} article={article} />;
+  return <ArticleView article={article} list={list} />;
 }
