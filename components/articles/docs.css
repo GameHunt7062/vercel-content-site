@@ -17,6 +17,7 @@
   width: 40px; height: 40px; display: grid; place-items: center; flex: none;
   border-radius: 999px; border: 1px solid #dcdcec; background: #fff; color: #0a0a23;
 }
+.docs-back-space { display: inline-block; width: 40px; height: 40px; flex: none; }   /* blank placeholder where the back button used to be */
 .docs-back:hover { background: var(--rawme-pink, #ff0085); border-color: var(--rawme-pink, #ff0085); color: #fff; }
 
 .docs-list { display: flex; flex-direction: column; }

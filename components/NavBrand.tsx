@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation";
 /**
  * Left side of the navbar.
  * - normal pages: "Rawme Arzu" (goes to the home page)
- * - /article and /article/<slug>: "Rawme / Articles"  (Rawme -> home page, Articles -> /articles)
+ * - /articles, /article and /article/<slug>: "Rawme / Articles"  (Rawme -> home page, Articles -> /articles)
  */
 export default function NavBrand() {
   const path = (usePathname() || "/").replace(/\/+$/, "") || "/";
-  const onArticle = path === "/article" || path.startsWith("/article/");
+  const onArticle = path === "/articles" || path === "/article" || path.startsWith("/article/");
 
   if (!onArticle) {
     return <Link href="/" className="font-bold text-xl tracking-tight hover:text-rawme-pink">Rawme Arzu</Link>;
