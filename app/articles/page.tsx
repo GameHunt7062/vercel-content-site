@@ -59,7 +59,7 @@ export default async function Articles() {
       <ArticleDots />
       <main className="arts-wrap">
         <div className="arts-head">
-          <h1 className="arts-title">Articles</h1>
+          <h1 className="arts-title">All My Thoughts.</h1>
           {articles.length > 0 && (
             <p className="arts-count">{articles.length} {articles.length === 1 ? "article" : "articles"}</p>
           )}
