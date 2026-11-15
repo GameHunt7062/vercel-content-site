@@ -11,7 +11,6 @@ import {
   SOCIALS,
   type GlyphKey,
   type LinkItem,
-  type SocialPlatform,
 } from "@/lib/homeProfile";
 import {
   GlyphArt,
@@ -22,12 +21,7 @@ import {
   GlyphLink,
   GlyphProject,
   GlyphWave,
-  IconDiscord,
-  IconFacebook,
-  IconGitHub,
-  IconInstagram,
-  IconX,
-  IconYouTube,
+  BRAND_ICONS,
 } from "./icons";
 import "./home-profile.css";
 
@@ -36,15 +30,6 @@ const GLYPHS: Record<GlyphKey, (p: { className?: string }) => ReactNode> = {
   art: GlyphArt,
   project: GlyphProject,
   link: GlyphLink,
-};
-
-const BRAND: Record<SocialPlatform, (p: { className?: string }) => ReactNode> = {
-  youtube: IconYouTube,
-  instagram: IconInstagram,
-  github: IconGitHub,
-  discord: IconDiscord,
-  x: IconX,
-  facebook: IconFacebook,
 };
 
 const CARD = "rounded-[2rem] border bg-rawme-tint p-6 md:p-8 flex flex-col";
@@ -101,7 +86,7 @@ export default async function HomeProfile() {
   const bullets = p.intro.bullets.map((b) => b.trim()).filter(Boolean);
 
   return (
-    <section className="relative max-w-6xl mx-auto px-6 pt-12 md:pt-16">
+    <section className={`relative z-10 max-w-6xl mx-auto px-6 ${p.intro.visible && p.intro.image ? "pt-24 md:pt-32" : "pt-12 md:pt-16"}`}>
       <AdminOnly>
         <Link
           href="/admin/home"
@@ -114,15 +99,15 @@ export default async function HomeProfile() {
       <div className="stagger grid items-stretch gap-5 md:grid-cols-2">
         {/* 1 · I'm Rawme Arzu */}
         {p.intro.visible && (
-          <div className={`${CARD} hp-intro min-h-[17rem] justify-between`}>
-            <span className="hp-intro-dot" />
+          <div className={`${CARD} hp-intro min-h-[17rem] md:min-h-[18rem] justify-between`}>
+            <span className="hp-intro-clip"><span className="hp-intro-dot" /></span>
             {p.intro.image && <img src={p.intro.image} alt="" className="hp-intro-img" />}
-            <div className={`relative ${p.intro.image ? "max-w-[58%] md:max-w-[55%]" : ""}`}>
+            <div className={`hp-intro-text ${p.intro.image ? "max-w-[54%] md:max-w-[52%]" : ""}`}>
               <span className="hp-badge hp-badge--pink"><GlyphWave /></span>
-              <h2 className="hp-title mt-5 text-4xl md:text-5xl">{p.intro.title}</h2>
+              <h2 className="hp-title mt-5 text-4xl md:text-[2.75rem]">{p.intro.title}</h2>
             </div>
             {bullets.length > 0 && (
-              <ul className={`relative mt-5 space-y-0.5 text-base md:text-lg ${p.intro.image ? "max-w-[58%] md:max-w-[55%]" : ""}`}>
+              <ul className={`hp-intro-text mt-5 space-y-0.5 text-base md:text-lg ${p.intro.image ? "max-w-[54%] md:max-w-[52%]" : ""}`}>
                 {bullets.map((b, i) => <li key={i}>{b}</li>)}
               </ul>
             )}
@@ -141,7 +126,7 @@ export default async function HomeProfile() {
         {p.find.visible && (find.length > 0 || isAdmin) && (
           <Card icon={<GlyphExplore />} title={p.find.title}>
             {find.map((it) => {
-              const Brand = BRAND[it.platform];
+              const Brand = BRAND_ICONS[it.platform];
               const url = socialUrl(it);
               const body = (
                 <>

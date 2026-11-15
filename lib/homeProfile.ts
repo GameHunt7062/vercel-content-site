@@ -32,6 +32,16 @@ export type HomeProfile = {
   gallery: { visible: boolean; title: string; items: LinkItem[] };
   find: { visible: boolean; title: string; items: SocialItem[] };
   made: { visible: boolean; title: string; items: LinkItem[] };
+  footer: {
+    visible: boolean;
+    /** wordmark on the left */
+    brand: string;
+    /** contact button is shown only when the link below is filled (mailto:you@mail.com, you@mail.com or https://…) */
+    contactLabel: string;
+    contactHref: string;
+    /** small transparent character that sits on the top edge of the footer */
+    peekImage: string;
+  };
 };
 
 export const SOCIALS: Record<SocialPlatform, { name: string; build: ((handle: string) => string) | null }> = {
@@ -76,6 +86,7 @@ export const DEFAULTS: HomeProfile = {
     items: PLATFORM_ORDER.map((p) => ({ id: "d-" + p, platform: p, value: "", label: "" })),
   },
   made: { visible: true, title: "What I've made", items: [] },
+  footer: { visible: true, brand: "RAWME ARZU", contactLabel: "Contact", contactHref: "", peekImage: "" },
 };
 
 /* ---------- helpers ---------- */
@@ -90,6 +101,8 @@ export function safeHref(v: string) {
   if (!s) return "";
   if (s.startsWith("/") && !s.startsWith("//")) return s;
   if (isUrl(s)) return s;
+  if (/^mailto:[^\s]+$/i.test(s)) return s;
+  if (/^[^\s@/]+@[^\s@/]+\.[^\s@/]+$/.test(s)) return "mailto:" + s; // plain e-mail address
   // "example.com/me" typed without protocol
   if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/.test(s)) return "https://" + s;
   return "";
@@ -171,6 +184,13 @@ export function normalizeHomeProfile(raw: unknown): HomeProfile {
       visible: bool(r.made?.visible),
       title: str(r.made?.title, d.made.title),
       items: list(r.made?.items, (x) => linkItem(x, "project"), d.made.items),
+    },
+    footer: {
+      visible: bool(r.footer?.visible),
+      brand: str(r.footer?.brand, d.footer.brand),
+      contactLabel: str(r.footer?.contactLabel, d.footer.contactLabel),
+      contactHref: str(r.footer?.contactHref, d.footer.contactHref),
+      peekImage: str(r.footer?.peekImage, d.footer.peekImage),
     },
   };
 }

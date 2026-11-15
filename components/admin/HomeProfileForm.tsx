@@ -170,7 +170,7 @@ function LinkList({
 }
 
 function collectImages(p: HomeProfile): string[] {
-  return [p.intro.image, ...p.gallery.items.map((i) => i.image), ...p.made.items.map((i) => i.image)].filter(Boolean);
+  return [p.intro.image, p.footer.peekImage, ...p.gallery.items.map((i) => i.image), ...p.made.items.map((i) => i.image)].filter(Boolean);
 }
 
 export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
@@ -209,6 +209,7 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
   const setIntro = (patch: Partial<HomeProfile["intro"]>) => setP((s) => ({ ...s, intro: { ...s.intro, ...patch } }));
   const setGallery = (patch: Partial<HomeProfile["gallery"]>) => setP((s) => ({ ...s, gallery: { ...s.gallery, ...patch } }));
   const setFind = (patch: Partial<HomeProfile["find"]>) => setP((s) => ({ ...s, find: { ...s.find, ...patch } }));
+  const setFooter = (patch: Partial<HomeProfile["footer"]>) => setP((s) => ({ ...s, footer: { ...s.footer, ...patch } }));
   const setMade = (patch: Partial<HomeProfile["made"]>) => setP((s) => ({ ...s, made: { ...s.made, ...patch } }));
 
   const setSocial = (i: number, patch: Partial<SocialItem>) =>
@@ -231,7 +232,7 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
             <button type="button" className={btn} onClick={() => setIntro({ bullets: [...p.intro.bullets, ""] })}>+ Add bullet</button>
           </div>
         </div>
-        <ImageField label="Character image" hint="transparent PNG cutout, shown at the right side of the card" value={p.intro.image} onChange={(image) => setIntro({ image })} />
+        <ImageField label="Character image" hint="transparent PNG cutout · it sits at the right side and pops out above the card" value={p.intro.image} onChange={(image) => setIntro({ image })} />
       </Panel>
 
       {/* 2 */}
@@ -270,6 +271,18 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
       <Panel title="4 · What I've made" visible={p.made.visible} onVisible={(visible) => setMade({ visible })}>
         <Field label="Card title"><input className={inp} value={p.made.title} onChange={(e) => setMade({ title: e.target.value })} /></Field>
         <LinkList items={p.made.items} defaultIcon="project" onChange={(items) => setMade({ items })} />
+      </Panel>
+
+      {/* footer */}
+      <Panel title="5 · Footer (very bottom of home page)" visible={p.footer.visible} onVisible={(visible) => setFooter({ visible })}>
+        <p className="text-sm text-zinc-500">The round social icons are taken automatically from “Where to find me” (rows with a link).</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          <Field label="Name / wordmark (left side)"><input className={inp} value={p.footer.brand} onChange={(e) => setFooter({ brand: e.target.value })} /></Field>
+          <span />
+          <Field label="Contact button text"><input className={inp} value={p.footer.contactLabel} onChange={(e) => setFooter({ contactLabel: e.target.value })} /></Field>
+          <Field label="Contact link (email or URL) — empty = no button"><input className={inp} value={p.footer.contactHref} onChange={(e) => setFooter({ contactHref: e.target.value })} placeholder="you@gmail.com" /></Field>
+        </div>
+        <ImageField label="Peeking character" hint="optional · small transparent PNG that sits on the top edge of the footer" value={p.footer.peekImage} onChange={(peekImage) => setFooter({ peekImage })} />
       </Panel>
 
       <div className="sticky bottom-0 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border bg-white/95 p-3 backdrop-blur">
