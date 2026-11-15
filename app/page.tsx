@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import Hero from "@/components/Hero";
+import HomeProfile from "@/components/home/HomeProfile";
 import { EditLink } from "@/components/admin/EditButton";
 import SlideCount from "@/components/artwork/SlideCount";
 
@@ -17,6 +18,7 @@ export default async function Home() {
   return (
     <>
       <Hero />
+      <HomeProfile />
       <main className="max-w-6xl mx-auto px-6 py-16">
 
       <section>
