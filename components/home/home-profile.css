@@ -33,11 +33,12 @@ a.hp-row:hover .hp-row-go{color:var(--rawme-pink);transform:translateX(2px)}
 .hp-intro{position:relative;color:var(--foreground);
   background:radial-gradient(95% 125% at 100% 100%,rgb(255 0 133 / .30) 0%,rgb(255 0 133 / 0) 62%),
              radial-gradient(70% 90% at 0% 0%,rgb(0 18 255 / .10) 0%,rgb(0 18 255 / 0) 60%),var(--color-rawme-tint)}
-/* clipping box: free at the top, but cut by the card's rounded bottom corners */
-.hp-intro-pop{position:absolute;inset:0;pointer-events:none;z-index:2;clip-path:inset(-60vh 0 0 0 round 0 0 var(--hp-radius) var(--hp-radius))}
-.hp-intro-img{position:absolute;right:0;bottom:0;height:142%;max-width:70%;width:auto;object-fit:contain;object-position:right bottom}
+/* the character: bottom-aligned with the card, sticks out a little at the top and right.
+   It never takes part in the layout (absolute), so the card content stays exactly where it is. */
+.hp-intro-pop{position:absolute;inset:0;pointer-events:none;z-index:2}
+.hp-intro-img{position:absolute;right:-1rem;bottom:0;height:132%;max-width:46%;width:auto;object-fit:contain;object-position:right bottom}
 .hp-intro ul{list-style:disc;padding-left:1.25rem}
-@media (max-width:640px){.hp-intro-img{max-width:64%}}
+@media (max-width:640px){.hp-intro-img{right:-.5rem;max-width:50%}}
 .hp-intro-text{position:relative;z-index:3}
 
 /* footer: blue block with rounded top, like the navbar/hero */

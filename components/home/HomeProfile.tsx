@@ -99,11 +99,11 @@ export default async function HomeProfile() {
   const bullets = p.intro.bullets.map((b) => b.trim()).filter(Boolean);
 
   return (
-    <section className={`relative z-10 max-w-6xl mx-auto px-6 ${p.intro.visible && p.intro.image ? "pt-32 md:pt-44" : "pt-12 md:pt-16"}`}>
+    <section className="relative z-10 max-w-[88rem] mx-auto px-4 md:px-8 pt-28 md:pt-36">
       <AdminOnly>
         <Link
           href="/admin/home"
-          className="absolute right-6 top-3 z-10 rounded-md bg-rawme-pink px-2.5 py-1 text-xs font-medium text-white hover:bg-rawme-blue"
+          className="absolute right-4 md:right-8 top-3 z-10 rounded-md bg-rawme-pink px-2.5 py-1 text-xs font-medium text-white hover:bg-rawme-blue"
         >
           Edit sections
         </Link>
@@ -121,21 +121,40 @@ export default async function HomeProfile() {
                   <img src={p.intro.image} alt="" className="hp-intro-img" />
                 </span>
               )}
-              <div className={`hp-intro-text ${p.intro.image ? "max-w-[54%] md:max-w-[52%]" : ""}`}>
+              <div className="hp-intro-text">
                 <Badge shape="clover" tone="pink"><GlyphWave /></Badge>
                 <h2 className="hp-title mt-5 text-4xl md:text-[2.75rem] text-rawme-blue">{p.intro.title}</h2>
               </div>
               {bullets.length > 0 && (
-                <ul className={`hp-intro-text mt-5 space-y-0.5 text-base md:text-lg ${p.intro.image ? "max-w-[54%] md:max-w-[52%]" : ""}`}>
+                <ul className="hp-intro-text mt-5 space-y-0.5 text-base md:text-lg">
                   {bullets.map((b, i) => <li key={i}>{b}</li>)}
                 </ul>
               )}
             </div>
           )}
 
-          {/* 3 · Where to find me */}
+
+          {/* 3 · What I've made */}
+          {p.made.visible && (made.length > 0 || isAdmin) && (
+            <Card order={3} icon={<GlyphProject />} shape="pebble" tone="pink" title={p.made.title}>
+              {made.map((it) => <LinkRow key={it.id} item={it} />)}
+              {made.length === 0 && <EmptyHint text="Nothing here yet — add what you’ve made from “Edit sections”." />}
+            </Card>
+          )}
+        </div>
+
+        <div className="stagger contents md:flex md:flex-col md:gap-5">
+          {/* 2 · Thoughts and Gallery */}
+          {p.gallery.visible && (gallery.length > 0 || isAdmin) && (
+            <Card order={2} icon={<GlyphArt />} shape="hexagon" title={p.gallery.title}>
+              {gallery.map((it) => <LinkRow key={it.id} item={it} />)}
+              {gallery.length === 0 && <EmptyHint text="No links yet — use “Edit sections”." />}
+            </Card>
+          )}
+
+          {/* 4 · Where to find me */}
           {p.find.visible && (find.length > 0 || isAdmin) && (
-            <Card order={3} icon={<GlyphTouch />} shape="hexagon" title={p.find.title}>
+            <Card order={4} icon={<GlyphTouch />} shape="hexagon" title={p.find.title}>
               {find.map((it) => {
                 const Brand = BRAND_ICONS[it.platform];
                 const url = socialUrl(it);
@@ -156,24 +175,6 @@ export default async function HomeProfile() {
                 );
               })}
               {find.length === 0 && <EmptyHint text="No links yet — add your YouTube, Instagram, etc. from “Edit sections”." />}
-            </Card>
-          )}
-        </div>
-
-        <div className="stagger contents md:flex md:flex-col md:gap-5">
-          {/* 2 · Thoughts and Gallery */}
-          {p.gallery.visible && (gallery.length > 0 || isAdmin) && (
-            <Card order={2} icon={<GlyphArt />} shape="hexagon" title={p.gallery.title}>
-              {gallery.map((it) => <LinkRow key={it.id} item={it} />)}
-              {gallery.length === 0 && <EmptyHint text="No links yet — use “Edit sections”." />}
-            </Card>
-          )}
-
-          {/* 4 · What I've made */}
-          {p.made.visible && (made.length > 0 || isAdmin) && (
-            <Card order={4} icon={<GlyphProject />} shape="pebble" tone="pink" title={p.made.title}>
-              {made.map((it) => <LinkRow key={it.id} item={it} />)}
-              {made.length === 0 && <EmptyHint text="Nothing here yet — add what you’ve made from “Edit sections”." />}
             </Card>
           )}
         </div>
