@@ -2,7 +2,7 @@
  * Soft "cookie / clover / hexagon" outlines used as icon badges (same idea as the Material 3
  * expressive shapes on bignut.zip). Each shape is a closed path in a -1..1 box, built once from a polar curve.
  */
-export type ShapeKey = "clover" | "cookie" | "hexagon" | "burst";
+export type ShapeKey = "clover" | "hexagon" | "pebble";
 
 function path(radius: (t: number) => number, steps = 240) {
   let d = "";
@@ -30,8 +30,7 @@ const hexagon = (window: number) => (t: number) => {
 };
 
 export const SHAPES: Record<ShapeKey, string> = {
-  clover: path(lobes(4, 0.2)), // 4-leaf clover  (like the waving-hand badge)
-  cookie: path(lobes(8, 0.07)), // scalloped cookie
+  clover: path(lobes(4, 0.2)), // 4-leaf clover (waving-hand badge)
   hexagon: path(hexagon(0.2)), // rounded hexagon
-  burst: path(lobes(12, 0.045)), // fine scallops
+  pebble: path(lobes(3, 0.06)), // soft, slightly uneven blob
 };

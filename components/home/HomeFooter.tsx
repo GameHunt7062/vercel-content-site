@@ -16,7 +16,7 @@ export default async function HomeFooter() {
   const contact = safeHref(footer.contactHref);
 
   return (
-    <footer className="max-w-6xl mx-auto px-6 mt-8 md:mt-16">
+    <footer className="max-w-6xl mx-auto px-6 mt-14 md:mt-24">
       <div className="hp-footer">
         {footer.peekImage && <img src={footer.peekImage} alt="" className="hp-footer-peek" />}
 
