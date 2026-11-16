@@ -23,6 +23,7 @@ import {
   GlyphWave,
   BRAND_ICONS,
 } from "./icons";
+import { SHAPES, type ShapeKey } from "./shapes";
 import "./home-profile.css";
 
 const GLYPHS: Record<GlyphKey, (p: { className?: string }) => ReactNode> = {
@@ -32,13 +33,25 @@ const GLYPHS: Record<GlyphKey, (p: { className?: string }) => ReactNode> = {
   link: GlyphLink,
 };
 
-const CARD = "rounded-[2rem] border bg-rawme-tint p-6 md:p-8 flex flex-col";
+const CARD = "hp-card border bg-rawme-tint p-6 md:p-8 flex flex-col";
 
-function Card({ icon, badge = "", title, children }: { icon: ReactNode; badge?: string; title: string; children: ReactNode }) {
+/** Icon badge: coloured soft shape (clover / cookie / hexagon) with the glyph on top. */
+function Badge({ shape, tone = "", children }: { shape: ShapeKey; tone?: "" | "pink" | "white"; children: ReactNode }) {
+  return (
+    <span className={`hp-badge ${tone ? `hp-badge--${tone}` : ""}`}>
+      <svg className="hp-badge-shape" viewBox="-1 -1 2 2" aria-hidden="true">
+        <path d={SHAPES[shape]} fill="currentColor" />
+      </svg>
+      <span className="hp-badge-glyph">{children}</span>
+    </span>
+  );
+}
+
+function Card({ icon, shape, tone = "", title, children }: { icon: ReactNode; shape: ShapeKey; tone?: "" | "pink"; title: string; children: ReactNode }) {
   return (
     <div className={CARD}>
-      <span className={`hp-badge ${badge}`}>{icon}</span>
-      <h2 className="hp-title mt-5 mb-6 text-3xl md:text-4xl text-rawme-blue">{title}</h2>
+      <Badge shape={shape} tone={tone}>{icon}</Badge>
+      <h2 className="hp-title mt-5 mb-6 text-3xl md:text-[2.1rem] text-rawme-blue">{title}</h2>
       <div className="flex flex-col gap-2.5">{children}</div>
     </div>
   );
@@ -70,7 +83,7 @@ function LinkRow({ item }: { item: LinkItem }) {
 }
 
 function EmptyHint({ text }: { text: string }) {
-  return <p className="rounded-2xl border border-dashed border-rawme-blue/40 px-4 py-3 text-sm text-zinc-500">{text}</p>;
+  return <p className="rounded-xl border border-dashed border-rawme-blue/40 px-4 py-3 text-sm text-zinc-500">{text}</p>;
 }
 
 export default async function HomeProfile() {
@@ -86,7 +99,7 @@ export default async function HomeProfile() {
   const bullets = p.intro.bullets.map((b) => b.trim()).filter(Boolean);
 
   return (
-    <section className={`relative z-10 max-w-6xl mx-auto px-6 ${p.intro.visible && p.intro.image ? "pt-24 md:pt-32" : "pt-12 md:pt-16"}`}>
+    <section className={`relative z-10 max-w-6xl mx-auto px-6 ${p.intro.visible && p.intro.image ? "pt-32 md:pt-44" : "pt-12 md:pt-16"}`}>
       <AdminOnly>
         <Link
           href="/admin/home"
@@ -100,10 +113,13 @@ export default async function HomeProfile() {
         {/* 1 · I'm Rawme Arzu */}
         {p.intro.visible && (
           <div className={`${CARD} hp-intro min-h-[17rem] md:min-h-[18rem] justify-between`}>
-            <span className="hp-intro-clip"><span className="hp-intro-dot" /></span>
-            {p.intro.image && <img src={p.intro.image} alt="" className="hp-intro-img" />}
+            {p.intro.image && (
+              <span className="hp-intro-pop">
+                <img src={p.intro.image} alt="" className="hp-intro-img" />
+              </span>
+            )}
             <div className={`hp-intro-text ${p.intro.image ? "max-w-[54%] md:max-w-[52%]" : ""}`}>
-              <span className="hp-badge hp-badge--pink"><GlyphWave /></span>
+              <Badge shape="clover" tone="pink"><GlyphWave /></Badge>
               <h2 className="hp-title mt-5 text-4xl md:text-[2.75rem]">{p.intro.title}</h2>
             </div>
             {bullets.length > 0 && (
@@ -116,7 +132,7 @@ export default async function HomeProfile() {
 
         {/* 2 · Thoughts and Gallery */}
         {p.gallery.visible && (gallery.length > 0 || isAdmin) && (
-          <Card icon={<GlyphArt />} badge="hp-badge--pink" title={p.gallery.title}>
+          <Card icon={<GlyphArt />} shape="cookie" tone="pink" title={p.gallery.title}>
             {gallery.map((it) => <LinkRow key={it.id} item={it} />)}
             {gallery.length === 0 && <EmptyHint text="No links yet — use “Edit sections”." />}
           </Card>
@@ -124,7 +140,7 @@ export default async function HomeProfile() {
 
         {/* 3 · Where to find me */}
         {p.find.visible && (find.length > 0 || isAdmin) && (
-          <Card icon={<GlyphExplore />} title={p.find.title}>
+          <Card icon={<GlyphExplore />} shape="hexagon" title={p.find.title}>
             {find.map((it) => {
               const Brand = BRAND_ICONS[it.platform];
               const url = socialUrl(it);
@@ -150,7 +166,7 @@ export default async function HomeProfile() {
 
         {/* 4 · What I've made */}
         {p.made.visible && (made.length > 0 || isAdmin) && (
-          <Card icon={<GlyphProject />} badge="hp-badge--pink" title={p.made.title}>
+          <Card icon={<GlyphProject />} shape="burst" tone="pink" title={p.made.title}>
             {made.map((it) => <LinkRow key={it.id} item={it} />)}
             {made.length === 0 && <EmptyHint text="Nothing here yet — add what you’ve made from “Edit sections”." />}
           </Card>

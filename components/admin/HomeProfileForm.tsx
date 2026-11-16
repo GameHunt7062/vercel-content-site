@@ -232,7 +232,7 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
             <button type="button" className={btn} onClick={() => setIntro({ bullets: [...p.intro.bullets, ""] })}>+ Add bullet</button>
           </div>
         </div>
-        <ImageField label="Character image" hint="transparent PNG cutout · it sits at the right side and pops out above the card" value={p.intro.image} onChange={(image) => setIntro({ image })} />
+        <ImageField label="Character image" hint="transparent PNG cutout · sits flush on the right and pops out above the card" value={p.intro.image} onChange={(image) => setIntro({ image })} />
       </Panel>
 
       {/* 2 */}
@@ -280,7 +280,7 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
           <Field label="Name / wordmark (left side)"><input className={inp} value={p.footer.brand} onChange={(e) => setFooter({ brand: e.target.value })} /></Field>
           <span />
           <Field label="Contact button text"><input className={inp} value={p.footer.contactLabel} onChange={(e) => setFooter({ contactLabel: e.target.value })} /></Field>
-          <Field label="Contact link (email or URL) — empty = no button"><input className={inp} value={p.footer.contactHref} onChange={(e) => setFooter({ contactHref: e.target.value })} placeholder="you@gmail.com" /></Field>
+          <Field label="Your email (or any contact link) — button opens this"><input className={inp} value={p.footer.contactHref} onChange={(e) => setFooter({ contactHref: e.target.value })} placeholder="you@gmail.com" /></Field>
         </div>
         <ImageField label="Peeking character" hint="optional · small transparent PNG that sits on the top edge of the footer" value={p.footer.peekImage} onChange={(peekImage) => setFooter({ peekImage })} />
       </Panel>

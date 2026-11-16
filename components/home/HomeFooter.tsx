@@ -37,10 +37,15 @@ export default async function HomeFooter() {
 
         <div className="flex items-center justify-between gap-4">
           <span className="hp-footer-brand">{footer.brand}</span>
-          {contact && (
+          {contact ? (
             <a href={contact} {...(/^https?:/.test(contact) ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="hp-contact">
               <GlyphMail /> {footer.contactLabel || "Contact"}
             </a>
+          ) : (
+            // email not set yet (Admin → Home page cards → Footer): button is visible but not clickable
+            <span className="hp-contact" aria-disabled="true">
+              <GlyphMail /> {footer.contactLabel || "Contact"}
+            </span>
           )}
         </div>
       </div>

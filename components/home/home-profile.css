@@ -1,15 +1,20 @@
 /* Home profile cards (under the hero). Colours come from the RAWME palette in globals.css. */
-.hp-title{font-family:"flegrei","Arial Black",sans-serif;font-weight:700;line-height:1.02;letter-spacing:-.01em}
+:root{--hp-radius:1.25rem}
+/* card titles use the normal site font (NOT the hero font) */
+.hp-title{font-family:inherit;font-weight:700;line-height:1.05;letter-spacing:-.02em}
+.hp-card{border-radius:var(--hp-radius)}
 
-/* soft rounded "badge" that holds the icon at the top of every card */
-.hp-badge{display:grid;place-items:center;width:3.25rem;height:3.25rem;border-radius:1.1rem;
-  background:var(--rawme-blue);color:#fff;flex:none}
-.hp-badge--pink{background:var(--rawme-pink)}
-.hp-badge--white{background:#fff;color:var(--rawme-blue)}
-.hp-badge svg{width:1.7rem;height:1.7rem}
+/* icon badge: coloured cookie/clover/hexagon shape with the glyph on top */
+.hp-badge{position:relative;display:grid;place-items:center;width:3.4rem;height:3.4rem;flex:none;color:#fff}
+.hp-badge-shape{position:absolute;inset:0;width:100%;height:100%;color:var(--rawme-blue)}
+.hp-badge--pink .hp-badge-shape{color:var(--rawme-pink)}
+.hp-badge--white .hp-badge-shape{color:#fff}
+.hp-badge--white{color:var(--rawme-blue)}
+.hp-badge-glyph{position:relative;display:grid;place-items:center}
+.hp-badge-glyph svg{width:1.65rem;height:1.65rem}
 
 /* a clickable row (link) inside a card */
-.hp-row{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;border-radius:1.15rem;background:#fff;
+.hp-row{display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;border-radius:.85rem;background:#fff;
   border:1px solid rgb(0 18 255 / .12);color:var(--foreground);
   transition:transform .3s var(--ease-out),border-color .25s,box-shadow .3s var(--ease-out)}
 a.hp-row:hover{transform:translateY(-2px);border-color:var(--rawme-pink);box-shadow:0 12px 24px -14px rgb(0 18 255 / .5)}
@@ -21,18 +26,18 @@ a.hp-row:hover .hp-row-go{color:var(--rawme-pink);transform:translateX(2px)}
 .hp-row-go{width:1.4rem;height:1.4rem;flex:none;margin-left:auto;color:var(--rawme-blue);
   transition:transform .25s var(--ease-out),color .25s}
 
-/* intro card: blue like the hero. The character is taller than the card and pops out of its top edge */
-.hp-intro{position:relative;background:var(--rawme-blue);color:#fff}
-.hp-intro-clip{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
-.hp-intro-dot{position:absolute;right:-1.6rem;top:-1.6rem;width:5rem;height:5rem;border-radius:50%;background:var(--rawme-pink)}
-.hp-intro-img{position:absolute;right:.75rem;bottom:0;height:125%;max-width:62%;width:auto;object-fit:contain;object-position:right bottom;pointer-events:none;z-index:2;
-  filter:drop-shadow(0 10px 18px rgb(0 0 40 / .25))}
+/* intro card: blue -> pink gradient. The character pops out of the top (and sits flush on the right) */
+.hp-intro{position:relative;color:#fff;border-color:transparent;
+  background:radial-gradient(120% 120% at 100% 100%,#ff0085 0%,rgb(255 0 133 / 0) 55%),linear-gradient(120deg,#0012ff 30%,#4a1cff 100%)}
+/* clipping box: free at the top, but cut by the card's rounded bottom corners */
+.hp-intro-pop{position:absolute;inset:0;pointer-events:none;z-index:2;clip-path:inset(-60vh 0 0 0 round 0 0 var(--hp-radius) var(--hp-radius))}
+.hp-intro-img{position:absolute;right:0;bottom:0;height:142%;max-width:70%;width:auto;object-fit:contain;object-position:right bottom}
 .hp-intro ul{list-style:disc;padding-left:1.25rem}
-@media (max-width:640px){.hp-intro-img{right:0;max-width:58%}}
+@media (max-width:640px){.hp-intro-img{max-width:64%}}
 .hp-intro-text{position:relative;z-index:3}
 
 /* footer: blue block with rounded top, like the navbar/hero */
-.hp-footer{position:relative;background:var(--rawme-blue);color:#fff;border-radius:2rem 2rem 0 0;padding:2rem 2rem 1.75rem}
+.hp-footer{position:relative;background:var(--rawme-blue);color:#fff;border-radius:var(--hp-radius) var(--hp-radius) 0 0;padding:2rem 2rem 1.75rem}
 .hp-footer-peek{position:absolute;right:2.5rem;bottom:100%;height:4.5rem;width:auto;pointer-events:none;margin-bottom:-1px}
 .hp-social{display:grid;place-items:center;width:2.9rem;height:2.9rem;border-radius:50%;background:var(--rawme-pink);color:#fff;
   transition:transform .3s var(--ease-out),background-color .25s,color .25s}
@@ -42,5 +47,6 @@ a.hp-row:hover .hp-row-go{color:var(--rawme-pink);transform:translateX(2px)}
 .hp-footer-brand{font-family:"flegrei","Arial Black",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:-.01em;line-height:.9;font-size:clamp(1.8rem,5vw,3rem)}
 .hp-contact{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;background:var(--rawme-pink);color:#fff;padding:.7rem 1.3rem;font-weight:600;font-size:.95rem;
   transition:background-color .25s,color .25s,transform .25s var(--ease-out)}
-.hp-contact:hover{background:#fff;color:var(--rawme-blue)}
+a.hp-contact:hover{background:#fff;color:var(--rawme-blue)}
+span.hp-contact{opacity:.85}
 .hp-contact svg{width:1.3rem;height:1.3rem}
