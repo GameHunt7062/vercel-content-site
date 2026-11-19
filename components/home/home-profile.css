@@ -2,10 +2,10 @@
 :root{--hp-radius:1.25rem}
 /* card titles use the normal site font (NOT the hero font) */
 .hp-title{font-family:inherit;font-weight:700;line-height:1.05;letter-spacing:-.02em}
-/* the 4 cards are dark navy (#101027); the white rows inside keep dark text via --foreground */
-.hp-card{border-radius:var(--hp-radius);background:var(--hp-card-bg);border-color:rgb(255 255 255 / .08);--foreground:#0a0a23;--link:#0012ff;color:#fff}
-:root{--hp-card-bg:#101027}
-/* titles sit on the dark card, so they are white (rows inside stay white with dark text) */
+/* the 4 cards are dark navy (#0E103F); the rows inside are #1C1C31 with light text via --foreground */
+.hp-card{border-radius:var(--hp-radius);background:var(--hp-card-bg);border-color:rgb(255 255 255 / .08);--foreground:#fff;--link:#0012ff;color:#fff}
+:root{--hp-card-bg:#0E103F;--hp-row-bg:#1C1C31;--hp-row-hover:#2a2a4a;--hp-row-icon:#8b97ff}
+/* titles sit on the dark card, so they are white */
 .hp-title{color:#fff}
 
 /* icon badge: soft cookie/clover/hexagon shape with the glyph on top.
@@ -20,14 +20,15 @@
 /* list of rows: tightly stacked, small radius inside, big radius on the outer corners (like bignut.zip) */
 :root{--hp-radius-in:.95rem}
 .hp-list{display:flex;flex-direction:column;gap:.2rem}
-.hp-row{display:flex;align-items:center;gap:1rem;padding:.7rem 1rem;border-radius:.4rem;background:#fff;color:var(--foreground);
+.hp-row{display:flex;align-items:center;gap:1rem;padding:.7rem 1rem;border-radius:.4rem;background:var(--hp-row-bg);color:var(--foreground);
   transition:background-color .25s}
 .hp-list>.hp-row:first-child{border-top-left-radius:var(--hp-radius-in);border-top-right-radius:var(--hp-radius-in)}
 .hp-list>.hp-row:last-child{border-bottom-left-radius:var(--hp-radius-in);border-bottom-right-radius:var(--hp-radius-in)}
-a.hp-row:hover{background:#fff0f8}
+a.hp-row:hover{background:var(--hp-row-hover)}
+.hp-row .text-zinc-500{color:#9a9ab5}
 a.hp-row:hover .hp-row-go{color:var(--rawme-pink);transform:translateX(2px)}
 /* plain icon (no circle behind it); uploaded images are shown round */
-.hp-row-icon{display:grid;place-items:center;width:2.5rem;height:2.5rem;flex:none;color:var(--rawme-blue)}
+.hp-row-icon{display:grid;place-items:center;width:2.5rem;height:2.5rem;flex:none;color:var(--hp-row-icon)}
 .hp-row-icon svg{width:1.6rem;height:1.6rem}
 .hp-row-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .hp-row-go{width:1.4rem;height:1.4rem;flex:none;margin-left:auto;color:var(--foreground);
