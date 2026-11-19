@@ -3,6 +3,7 @@ import "@/components/articles/articles.css";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminUser } from "@/lib/admin";
 import ArticleDots from "@/components/articles/ArticleDots";
+import SiteFooter from "@/components/home/SiteFooter";
 
 type Row = {
   id: string;
@@ -55,6 +56,7 @@ export default async function Articles() {
   const articles = (data ?? []) as Row[];
 
   return (
+    <>
     <div className="arts-page">
       <ArticleDots />
       <main className="arts-wrap">
@@ -108,5 +110,7 @@ export default async function Articles() {
         )}
       </main>
     </div>
+    <SiteFooter />
+    </>
   );
 }

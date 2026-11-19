@@ -1,16 +1,13 @@
 import Hero from "@/components/Hero";
 import HomeProfile from "@/components/home/HomeProfile";
-import HomeBottom from "@/components/home/HomeBottom";
-import HomeFooter from "@/components/home/HomeFooter";
+import SiteFooter from "@/components/home/SiteFooter";
 
 export default function Home() {
   return (
     <>
       <Hero />
       <HomeProfile />
-      <HomeBottom>
-        <HomeFooter />
-      </HomeBottom>
+      <SiteFooter />
     </>
   );
 }
