@@ -8,7 +8,7 @@ export default function HomeBottom({ children }: { children?: ReactNode }) {
   return (
     <section className="hb" aria-label="An Artist, An Essential">
       <HomeParallax />
-      <div className="hb-fit" data-hb-px>
+      <div className="hb-fit hb-artist-wrap" data-hb-px>
         <h2 className="hb-line hb-artist">An Artist</h2>
       </div>
 

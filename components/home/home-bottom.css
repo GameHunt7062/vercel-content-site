@@ -12,18 +12,19 @@
 /* each line fills the full screen width: font-size = container width / text width (in em).
    --hb-w is the text's width at 1em in this font (kerning off so the number is exact). */
 .hb-fit{container-type:inline-size;width:100%;overflow-x:clip}
+.hb-artist-wrap{position:relative;z-index:2}   /* "An Artist" stays in front of the photo while it parallaxes */
 .hb-line{
   margin:0;white-space:nowrap;font-family:"Roboto Condensed Light","Roboto Condensed","Arial Narrow",sans-serif;
   font-weight:300;font-kerning:none;letter-spacing:0;line-height:.9;
   font-size:calc(100cqw / var(--hb-w));
 }
 .hb-artist{color:var(--hb-artist);--hb-w:3.253;
-  /* parallax: "An Artist" scrolls slower than the page, so it slowly sinks behind the photo (photo is later in the DOM + position:relative) */
+  /* parallax: "An Artist" scrolls slower than the page, so it slowly slides down over the photo (it is in front of the photo) */
   transform:translate3d(0,calc(var(--p,0) * 60%),0);will-change:transform}
 .hb-essential{color:var(--hb-essential);--hb-w:4.621}
 
 /* photo: wide crop, blue layer on top that gets solid at the bottom */
-.hb-photo{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;background:#000}
+.hb-photo{position:relative;z-index:1;width:100%;aspect-ratio:4/5;overflow:hidden;background:#000}
 @media (min-width:768px){.hb-photo{aspect-ratio:4/3}}
 .hb-photo{--hb-over:.16}
 .hb-photo img{position:absolute;left:0;top:0;width:100%;height:calc(100% * (1 + var(--hb-over)));object-fit:cover;object-position:50% 0%;display:block;
@@ -43,5 +44,19 @@
 .hb-blue{background:var(--hb-blue)}
 .hb-half{container-type:inline-size;width:100%;text-align:center;padding:3rem 0 0;overflow-x:clip}
 .hb-half .hb-line{font-size:calc(75cqw / var(--hb-w))}   /* 75% of the page width (was 50%: 1.5x bigger) */
-.hb-fade{height:9rem;background:linear-gradient(to bottom,var(--hb-blue),var(--hb-end))}
+/* long fade with eased (smoothstep) stops, so there is no visible start/end line between #0012ff and #030392 */
+.hb-fade{height:clamp(10rem,22vw,20rem);background:linear-gradient(to bottom,
+    rgb(0 18 255) 0.0%,
+    rgb(0 18 253) 8.3%,
+    rgb(0 17 247) 16.7%,
+    rgb(0 16 238) 25.0%,
+    rgb(1 14 227) 33.3%,
+    rgb(1 12 214) 41.7%,
+    rgb(2 10 200) 50.0%,
+    rgb(2 9 187) 58.3%,
+    rgb(2 7 174) 66.7%,
+    rgb(3 5 163) 75.0%,
+    rgb(3 4 154) 83.3%,
+    rgb(3 3 148) 91.7%,
+    rgb(3 3 146) 100.0%)}
 .hb-end{background:var(--hb-end);display:flow-root}      /* flow-root: footer's top margin stays inside the dark block */
