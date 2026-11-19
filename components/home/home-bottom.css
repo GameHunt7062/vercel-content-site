@@ -22,16 +22,19 @@
 
 /* photo: wide crop, blue layer on top that gets solid at the bottom */
 .hb-photo{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;background:#000}
-@media (min-width:768px){.hb-photo{aspect-ratio:16/10}}
-.hb-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:block}
+@media (min-width:768px){.hb-photo{aspect-ratio:4/3}}
+.hb-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0%;display:block}
 .hb-photo::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(to bottom,
-    rgb(0 18 255 / .42) 0%,
-    rgb(0 18 255 / .55) 40%,
-    rgb(0 18 255 / .85) 75%,
+    rgb(0 18 255 / .38) 0%,
+    rgb(0 18 255 / .45) 50%,
+    rgb(0 18 255 / .65) 75%,
+    rgb(0 18 255 / .88) 92%,
     var(--hb-blue) 100%);
 }
 
-/* the blue carries on behind "An Essential" */
-.hb-bottom{background:var(--hb-blue);padding:.5rem 0 1.25rem}
+/* the blue carries on behind "An Essential" AND the footer, down to the very bottom of the page */
+.hb-blue{background:var(--hb-blue)}
+.hb-half{container-type:inline-size;width:100%;text-align:center;padding:3rem 0 0;overflow-x:clip}
+.hb-half .hb-line{font-size:calc(50cqw / var(--hb-w))}

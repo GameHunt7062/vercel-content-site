@@ -8,8 +8,9 @@ export default function Home() {
     <>
       <Hero />
       <HomeProfile />
-      <HomeBottom />
-      <HomeFooter />
+      <HomeBottom>
+        <HomeFooter />
+      </HomeBottom>
     </>
   );
 }
