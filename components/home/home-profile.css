@@ -47,16 +47,17 @@ a.hp-row:hover .hp-row-go{color:var(--rawme-pink);transform:translateX(2px)}
 .hp-intro-text{position:relative;z-index:3}
 
 /* footer: blue block with rounded top, like the navbar/hero */
-.hp-footer{position:relative;background:var(--rawme-blue);color:#fff;border-radius:var(--hp-radius) var(--hp-radius) 0 0;padding:2rem 2rem 1.75rem}
+:root{--hp-footer-bg:#030392}
+.hp-footer{position:relative;background:var(--hp-footer-bg);color:#fff;border-radius:var(--hp-radius) var(--hp-radius) 0 0;padding:2rem 2rem 1.75rem}
 .hp-footer-peek{position:absolute;right:2.5rem;bottom:100%;height:4.5rem;width:auto;pointer-events:none;margin-bottom:-1px}
-.hp-social{display:grid;place-items:center;width:2.9rem;height:2.9rem;border-radius:50%;background:var(--rawme-pink);color:#fff;
+.hp-social{display:grid;place-items:center;width:2.9rem;height:2.9rem;border-radius:50%;background:#fff;color:var(--hp-footer-bg);
   transition:transform .3s var(--ease-out),background-color .25s,color .25s}
-.hp-social:hover{transform:translateY(-3px) scale(1.06);background:#fff;color:var(--rawme-blue)}
+.hp-social:hover{transform:translateY(-3px) scale(1.06);background:#dfe1ff}
 .hp-social svg{width:1.4rem;height:1.4rem}
 .hp-footer-line{height:1px;background:rgb(255 255 255 / .28);margin:3.5rem 0 1.5rem}
 .hp-footer-brand{font-family:"flegrei","Arial Black",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:-.01em;line-height:.9;font-size:clamp(1.8rem,5vw,3rem)}
-.hp-contact{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;background:var(--rawme-pink);color:#fff;padding:.7rem 1.3rem;font-weight:600;font-size:.95rem;
+.hp-contact{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;background:#fff;color:var(--hp-footer-bg);padding:.7rem 1.3rem;font-weight:600;font-size:.95rem;
   transition:background-color .25s,color .25s,transform .25s var(--ease-out)}
-a.hp-contact:hover{background:#fff;color:var(--rawme-blue)}
+a.hp-contact:hover{background:#dfe1ff}
 span.hp-contact{opacity:.85}
 .hp-contact svg{width:1.3rem;height:1.3rem}
