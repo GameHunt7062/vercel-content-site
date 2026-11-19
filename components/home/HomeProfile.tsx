@@ -33,7 +33,7 @@ const GLYPHS: Record<GlyphKey, (p: { className?: string }) => ReactNode> = {
   link: GlyphLink,
 };
 
-const CARD = "hp-card border bg-rawme-tint p-6 md:p-8 flex flex-col";
+const CARD = "hp-card border p-6 md:p-8 flex flex-col";
 
 /** Icon badge: coloured soft shape (clover / cookie / hexagon) with the glyph on top. */
 function Badge({ shape, tone = "", children }: { shape: ShapeKey; tone?: "" | "pink" | "white"; children: ReactNode }) {
@@ -51,7 +51,7 @@ function Card({ icon, shape, tone = "", title, order, children }: { icon: ReactN
   return (
     <div className={CARD} style={{ order }}>
       <Badge shape={shape} tone={tone}>{icon}</Badge>
-      <h2 className="hp-title mt-5 mb-6 text-3xl md:text-[2.1rem] text-rawme-blue">{title}</h2>
+      <h2 className="hp-title mt-5 mb-6 text-3xl md:text-[2.1rem]">{title}</h2>
       <div className="hp-list">{children}</div>
     </div>
   );
@@ -123,7 +123,7 @@ export default async function HomeProfile() {
               )}
               <div className="hp-intro-text">
                 <Badge shape="clover" tone="pink"><GlyphWave /></Badge>
-                <h2 className="hp-title mt-5 text-4xl md:text-[2.75rem] text-rawme-blue">{p.intro.title}</h2>
+                <h2 className="hp-title mt-5 text-4xl md:text-[2.75rem]">{p.intro.title}</h2>
               </div>
               {bullets.length > 0 && (
                 <ul className="hp-intro-text mt-5 space-y-0.5 text-base md:text-lg">
