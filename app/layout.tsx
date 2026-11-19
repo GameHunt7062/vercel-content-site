@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import NavGate from "@/components/NavGate";
+import ThemeScope from "@/components/ThemeScope";
 import type { Metadata, Viewport } from "next";
 import { AdminProvider } from "@/components/admin/AdminProvider";
 import { getAdminUser } from "@/lib/admin";
@@ -87,8 +88,10 @@ export default async function RootLayout({
 
       <body>
         <AdminProvider initialIsAdmin={!!admin}>
-          <NavGate><Navbar /></NavGate>
-          {children}
+          <ThemeScope>
+            <NavGate><Navbar /></NavGate>
+            {children}
+          </ThemeScope>
         </AdminProvider>
       </body>
     </html>

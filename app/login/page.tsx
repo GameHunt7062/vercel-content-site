@@ -17,7 +17,7 @@ export default function Login() {
   }
 
   return <main className="max-w-md mx-auto px-6 py-20">
-    <h1 className="text-3xl font-black mb-8 text-rawme-blue">Admin Login<span className="text-rawme-pink">.</span></h1>
+    <h1 className="text-3xl font-black mb-8 text-[var(--link)]">Admin Login<span className="text-rawme-pink">.</span></h1>
     <input className="w-full border rounded-lg p-3 mb-3" placeholder="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)}/>
     <input className="w-full border rounded-lg p-3 mb-3" placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)}/>
     {error && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{error}</p>}

@@ -102,7 +102,7 @@ function Popover({
         <div
           ref={panel}
           style={{ transform: `translateX(${shift}px)` }}
-          className={`absolute left-0 top-full z-30 mt-2 ${width} max-w-[calc(100vw-1rem)] rounded-xl border border-zinc-300 bg-white p-3 text-sm shadow-xl dark:border-zinc-700 dark:bg-zinc-900`}
+          className={`absolute left-0 top-full z-30 mt-2 ${width} max-w-[calc(100vw-1rem)] rounded-xl border border-zinc-300 bg-white p-3 text-sm shadow-xl dark:border-zinc-700 dark:bg-[#1c1c31]`}
         >
           {children(() => setOpen(false))}
         </div>
@@ -354,8 +354,8 @@ function EditorShell({ editor }: { editor: Editor }) {
   const textColor = normalizeHex(s.color);
 
   return (
-    <div className="rounded-xl border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-      <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-xl border-b border-zinc-300 bg-white p-2 dark:border-zinc-700 dark:bg-zinc-900">
+    <div className="rounded-xl border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-[#1c1c31]">
+      <div className="sticky top-0 z-20 flex flex-wrap items-center gap-1 rounded-t-xl border-b border-zinc-300 bg-white p-2 dark:border-zinc-700 dark:bg-[#1c1c31]">
         <Btn title="Undo (Ctrl+Z)" disabled={!s.canUndo} onClick={() => c().undo().run()}>↶</Btn>
         <Btn title="Redo (Ctrl+Y)" disabled={!s.canRedo} onClick={() => c().redo().run()}>↷</Btn>
         <Sep />
@@ -368,7 +368,7 @@ function EditorShell({ editor }: { editor: Editor }) {
             if (v === "p") c().setParagraph().run();
             else c().setHeading({ level: Number(v) as 1 | 2 | 3 }).run();
           }}
-          className="h-8 rounded-md border border-zinc-300 bg-transparent px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className="h-8 rounded-md border border-zinc-300 bg-transparent px-2 text-sm dark:border-zinc-700 dark:bg-[#1c1c31]"
         >
           <option value="p">Paragraph</option>
           <option value="1">Heading 1</option>

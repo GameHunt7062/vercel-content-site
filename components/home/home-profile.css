@@ -2,7 +2,8 @@
 :root{--hp-radius:1.25rem}
 /* card titles use the normal site font (NOT the hero font) */
 .hp-title{font-family:inherit;font-weight:700;line-height:1.05;letter-spacing:-.02em}
-.hp-card{border-radius:var(--hp-radius)}
+/* the 4 cards stay light-blue, so their text stays dark even though the page behind is dark */
+.hp-card{border-radius:var(--hp-radius);--foreground:#0a0a23;--link:#0012ff;color:#0a0a23}
 
 /* icon badge: soft cookie/clover/hexagon shape with the glyph on top.
    default = quiet container (light-blue shape, blue glyph); --pink = bright (pink shape, white glyph) */

@@ -13,9 +13,9 @@ export default async function AdminHome() {
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
-      <Link href="/admin" className="text-sm text-rawme-blue">← Admin</Link>
+      <Link href="/admin" className="text-sm text-[var(--link)]">← Admin</Link>
       <h1 className="text-3xl font-black mt-2 mb-1">Home page cards</h1>
-      <p className="text-zinc-600 mb-6">Edit the 4 cards shown under the hero on the home page.</p>
+      <p className="text-zinc-600 dark:text-zinc-400 mb-6">Edit the 4 cards shown under the hero on the home page.</p>
       <HomeProfileForm initial={normalizeHomeProfile(row?.data)} />
     </main>
   );

@@ -74,7 +74,7 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   if (count <= 1) {
-    return <img src={images[0]} alt={title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-rawme-tint" />;
+    return <img src={images[0]} alt={title} className="w-full max-h-[75vh] object-contain rounded-2xl bg-rawme-tint dark:bg-white/5" />;
   }
 
   const slides = [images[count - 1], ...images, images[0]];
@@ -101,7 +101,7 @@ export default function ArtworkSlider({ images, title }: { images: string[]; tit
   return (
     <div className="space-y-3" onKeyDown={onKeyDown}>
       <div
-        className="relative rounded-2xl bg-rawme-tint overflow-hidden touch-pan-y focus:outline-none"
+        className="relative rounded-2xl bg-rawme-tint dark:bg-white/5 overflow-hidden touch-pan-y focus:outline-none"
         tabIndex={0}
         aria-roledescription="carousel"
         aria-label={`${title} — slide ${current} of ${count}`}

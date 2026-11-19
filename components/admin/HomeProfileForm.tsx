@@ -17,8 +17,8 @@ import {
   type SocialPlatform,
 } from "@/lib/homeProfile";
 
-const inp = "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm";
-const btn = "rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm hover:bg-zinc-100 disabled:opacity-40";
+const inp = "w-full rounded-lg border border-zinc-300 bg-[#1c1c31] px-3 py-2 text-sm dark:border-zinc-600";
+const btn = "rounded-lg border border-zinc-300 bg-[#1c1c31] px-3 py-2 text-sm hover:bg-white/10 disabled:opacity-40 dark:border-zinc-600";
 
 function move<T>(arr: T[], i: number, dir: -1 | 1): T[] {
   const j = i + dir;
@@ -40,9 +40,9 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border bg-white p-5">
+    <section className="rounded-2xl border bg-[#1c1c31] p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-rawme-blue">{title}</h2>
+        <h2 className="text-lg font-bold text-[var(--link)]">{title}</h2>
         <label className="flex cursor-pointer items-center gap-2 text-sm">
           <input type="checkbox" checked={visible} onChange={(e) => onVisible(e.target.checked)} />
           Show on home page
@@ -143,7 +143,7 @@ function LinkList({
   return (
     <div className="space-y-3">
       {items.map((it, i) => (
-        <div key={it.id} className="space-y-3 rounded-xl border bg-rawme-tint/50 p-4">
+        <div key={it.id} className="space-y-3 rounded-xl border bg-white/5 p-4">
           <div className="grid gap-3 md:grid-cols-2">
             <Field label="Title"><input className={inp} value={it.title} onChange={(e) => set(i, { title: e.target.value })} placeholder="Gramophone" /></Field>
             <Field label="Small text under title"><input className={inp} value={it.subtitle} onChange={(e) => set(i, { subtitle: e.target.value })} placeholder="What it is, in one line" /></Field>
@@ -250,7 +250,7 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
         </p>
         <div className="space-y-3">
           {p.find.items.map((it, i) => (
-            <div key={it.id} className="space-y-3 rounded-xl border bg-rawme-tint/50 p-4">
+            <div key={it.id} className="space-y-3 rounded-xl border bg-white/5 p-4">
               <div className="grid gap-3 md:grid-cols-3">
                 <Field label="Platform">
                   <select className={inp} value={it.platform} onChange={(e) => setSocial(i, { platform: e.target.value as SocialPlatform })}>
@@ -285,12 +285,12 @@ export default function HomeProfileForm({ initial }: { initial: HomeProfile }) {
         <ImageField label="Peeking character" hint="optional · small transparent PNG that sits on the top edge of the footer" value={p.footer.peekImage} onChange={(peekImage) => setFooter({ peekImage })} />
       </Panel>
 
-      <div className="sticky bottom-0 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border bg-white/95 p-3 backdrop-blur">
+      <div className="sticky bottom-0 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border bg-[#1c1c31]/95 p-3 backdrop-blur">
         <button type="button" disabled={saving} onClick={save} className="rounded-lg bg-rawme-blue px-6 py-2.5 text-sm font-semibold text-white hover:bg-rawme-pink disabled:opacity-50">
           {saving ? "Saving…" : "Save changes"}
         </button>
         <Link href="/" className={btn}>View home page</Link>
-        {msg && <p className={`text-sm ${msg.ok ? "text-green-700" : "text-red-600"}`}>{msg.text}</p>}
+        {msg && <p className={`text-sm ${msg.ok ? "text-green-400" : "text-red-600"}`}>{msg.text}</p>}
       </div>
     </div>
   );

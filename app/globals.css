@@ -17,13 +17,26 @@
   --rawme-pink: #ff0085;
   --background: #ffffff;
   --foreground: #0a0a23;
+  --link: #0012ff; /* link / accent-text colour (lighter on the dark pages, see below) */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
+}
+
+/* ---------- DARK PAGES ----------
+   Every page except the home hero artwork and /art gets the #1C1C31 background (see components/ThemeScope.tsx,
+   which puts class "dark" around the page; /art does not get it). */
+html:has(.dark) {
+  --background: #1c1c31;
+  --foreground: #ececf8;
+  --link: #8f98ff;
+  background: #1c1c31;
+  color-scheme: dark;
 }
 
 /* ---------- base: soft borders, smooth transitions, focus ---------- */
 @layer base {
   *, ::after, ::before { border-color: rgb(0 18 255 / 0.14); }
+  .dark *, .dark ::after, .dark ::before { border-color: rgb(255 255 255 / 0.16); }
 
   a, button, input, textarea, select {
     transition:
@@ -68,7 +81,7 @@ body { background: var(--background); color: var(--foreground); }
 .tiptap p { margin: .75rem 0; line-height: 1.75; }
 .tiptap ul { list-style: disc; padding-left: 1.5rem; margin: .8rem 0; }
 .tiptap ol { list-style: decimal; padding-left: 1.5rem; margin: .8rem 0; }
-.tiptap blockquote { border-left: 4px solid var(--rawme-pink); padding-left: 1rem; color: #444; margin: 1rem 0; }
+.tiptap blockquote { border-left: 4px solid var(--rawme-pink); padding-left: 1rem; color: color-mix(in srgb, var(--foreground) 78%, transparent); margin: 1rem 0; }
 .tiptap pre { background: #0a0a23; color: #f4f4f5; border-radius: .75rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; }
 .tiptap code { background: #eef0ff; color: #0012ff; padding: .12rem .3rem; border-radius: .25rem; }
 .tiptap pre code { background: transparent; padding: 0; }
@@ -85,7 +98,7 @@ body { background: var(--background); color: var(--foreground); }
   pointer-events: none;
 }
 .tiptap mark { color: #111; border-radius: .2rem; padding: 0 .15em; background-color: #fde047; }
-.tiptap a { color: var(--rawme-blue); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.tiptap a { color: var(--link); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .tiptap hr { border: 0; border-top: 2px solid var(--rawme-pink); margin: 1.75rem 0; }
 .tiptap img.ProseMirror-selectednode { outline: 3px solid var(--rawme-blue); }
 .tiptap s { text-decoration: line-through; }

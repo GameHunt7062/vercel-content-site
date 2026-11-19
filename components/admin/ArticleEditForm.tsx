@@ -43,7 +43,7 @@ export default function ArticleEditForm({ article }: { article: any }) {
       <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" className={`${input} text-xl`} />
       <div className="grid md:grid-cols-2 gap-3">
         <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Category" className={input} />
-        <select value={status} onChange={(e) => setStatus(e.target.value as any)} className={`${input} dark:bg-zinc-900`}>
+        <select value={status} onChange={(e) => setStatus(e.target.value as any)} className={`${input} dark:bg-[#1c1c31]`}>
           <option value="published">Published</option>
           <option value="draft">Draft (hidden from visitors)</option>
         </select>
