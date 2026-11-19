@@ -1,0 +1,37 @@
+/* Big edge-to-edge words + photo with blue fade, under the home cards (above the footer). */
+@font-face{
+  font-family:"Roboto Condensed Light";
+  src:url("/fonts/RobotoCondensed-Light.ttf") format("truetype");
+  font-weight:300;font-style:normal;font-display:swap;
+}
+:root{--hb-artist:#1F1F35;--hb-essential:#2626A0;--hb-blue:#0012ff}
+
+.hb{margin-top:5rem}
+@media (min-width:768px){.hb{margin-top:8rem}}
+
+/* each line fills the full screen width: font-size = container width / text width (in em).
+   --hb-w is the text's width at 1em in this font (kerning off so the number is exact). */
+.hb-fit{container-type:inline-size;width:100%;overflow-x:clip}
+.hb-line{
+  margin:0;white-space:nowrap;font-family:"Roboto Condensed Light","Roboto Condensed","Arial Narrow",sans-serif;
+  font-weight:300;font-kerning:none;letter-spacing:0;line-height:.9;
+  font-size:calc(100cqw / var(--hb-w));
+}
+.hb-artist{color:var(--hb-artist);--hb-w:3.253}
+.hb-essential{color:var(--hb-essential);--hb-w:4.621}
+
+/* photo: wide crop, blue layer on top that gets solid at the bottom */
+.hb-photo{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;background:#000}
+@media (min-width:768px){.hb-photo{aspect-ratio:16/10}}
+.hb-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;display:block}
+.hb-photo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to bottom,
+    rgb(0 18 255 / .42) 0%,
+    rgb(0 18 255 / .55) 40%,
+    rgb(0 18 255 / .85) 75%,
+    var(--hb-blue) 100%);
+}
+
+/* the blue carries on behind "An Essential" */
+.hb-bottom{background:var(--hb-blue);padding:.5rem 0 1.25rem}
