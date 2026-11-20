@@ -1,5 +1,6 @@
 import Link from "next/link";
 import "@/components/articles/articles.css";
+import "@/components/articles/article-type.css";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminUser } from "@/lib/admin";
 import ArticleDots from "@/components/articles/ArticleDots";

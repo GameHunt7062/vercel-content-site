@@ -1,0 +1,40 @@
+/* ===== article typography + size for /articles and /article/... (fonts are declared in components/site-fonts.css) =====
+   Headings  -> Roboto Condensed Light (only the Light face exists, so weight is pinned to 300 to avoid fake-bold)
+   Text      -> Inter, thin. One knob: --article-body-weight (100 = Thin, 200 = ExtraLight, 300 = Light, 400 = Regular). */
+:root{--article-body-weight:200}
+
+/* ---- headings ---- */
+.docs .docs-title,
+.docs .docs-prose .tiptap :is(h1,h2,h3,h4,h5,h6),
+.docs .docs-item .t,
+.docs .docs-foot span,
+.arts-page .arts-title,
+.arts-page .arts-h{
+  font-family:"Roboto Condensed Light","Roboto Condensed","Arial Narrow",sans-serif;
+  font-weight:300;letter-spacing:.005em;
+}
+/* the condensed light face looks smaller than the old bold one, so headings get a bit bigger */
+.docs .docs-title{font-size:clamp(2.4rem,4.6vw,3.3rem);line-height:1.08}
+.docs .docs-prose .tiptap h1{font-size:2.1em}
+.docs .docs-prose .tiptap h2{font-size:1.7em}
+.docs .docs-prose .tiptap h3{font-size:1.4em}
+.docs .docs-item .t{font-size:19px}
+.docs .docs-foot span{font-size:1.2rem}
+.arts-page .arts-title{font-size:1.85rem;line-height:2.2rem}
+.arts-page .arts-h{font-size:1.5rem;line-height:1.9rem}
+
+/* ---- article text: Inter, thin ---- */
+.docs .docs-prose .tiptap,
+.docs .docs-sub,
+.docs .docs-item .s,
+.arts-page .arts-ex{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-weight:var(--article-body-weight);
+}
+
+/* ---- /article and /article/<slug>: everything 8% smaller, except the navbar and the two pink balls (they are outside this wrapper).
+   `zoom` shrinks every size inside (text, spacing, images, sidebar). Inside it, vh units shrink too, so full-height things are divided by the zoom. ---- */
+.article-zoom{--z:.92;zoom:var(--z)}
+.article-zoom .docs{min-height:calc(100vh / var(--z))}
+.article-zoom .docs-side{height:calc(100vh / var(--z))}
+@media (max-width:899px){.article-zoom .docs-drawer{max-height:calc(100vh / var(--z) - 60px)}}

@@ -13,10 +13,10 @@ export default function NavBrand() {
   const onArticle = path === "/articles" || path === "/article" || path.startsWith("/article/");
 
   if (!onArticle) {
-    return <Link href="/" className="font-bold text-xl tracking-tight hover:text-rawme-pink">Rawme Arzu</Link>;
+    return <Link href="/" className="site-nav-brand hover:text-rawme-pink">Rawme Arzu</Link>;
   }
   return (
-    <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+    <div className="site-nav-brand flex items-center gap-2">
       <Link href="/" className="hover:text-rawme-pink">Rawme</Link>
       <span aria-hidden className="opacity-60">/</span>
       <Link href="/articles" className="hover:text-rawme-pink">Articles</Link>
