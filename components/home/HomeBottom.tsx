@@ -2,18 +2,22 @@ import type { ReactNode } from "react";
 import "./home-bottom.css";
 import HomeParallax from "./HomeParallax";
 
-/** "An Artist" → photo fading into solid blue → "An Essential" (centred, 75% of the page width) → footer.
- *  The bright blue runs from the photo's bottom to under "An Essential", then fades into the dark #030392 end of the page where the footer sits (so the footer is passed in as children). */
+/** "An Artist" → photo (held still, uncovered by "An Artist" as you scroll) fading into blue → "An Essential" (centred, 75% of the page width)
+ *  → short fade into #030392 → footer. The footer is passed in as children. */
 export default function HomeBottom({ children }: { children?: ReactNode }) {
   return (
     <section className="hb" aria-label="An Artist, An Essential">
       <HomeParallax />
-      <div className="hb-fit hb-artist-wrap" data-hb-px>
-        <h2 className="hb-line hb-artist">An Artist</h2>
+      <div className="hb-top">
+        <div className="hb-fit">
+          <h2 className="hb-line hb-artist">An Artist</h2>
+        </div>
       </div>
 
-      <div className="hb-photo" data-hb-px>
-        <img src="/protfoliobottom.webp" alt="" loading="lazy" decoding="async" />
+      <div className="hb-photo" data-hb-pin>
+        <div className="hb-photo-layer">
+          <img src="/protfoliobottom.webp" alt="" loading="lazy" decoding="async" />
+        </div>
       </div>
 
       <div className="hb-blue">

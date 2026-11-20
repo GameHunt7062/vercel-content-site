@@ -4,33 +4,38 @@
   src:url("/fonts/RobotoCondensed-Light.ttf") format("truetype");
   font-weight:300;font-style:normal;font-display:swap;
 }
-:root{--hb-artist:#1F1F35;--hb-essential:#2626A0;--hb-blue:#0012ff;--hb-end:#030392}
+:root{--hb-page:#1c1c31;--hb-artist:#1F1F35;--hb-essential:#2626A0;--hb-blue:#0012ff;--hb-end:#030392}
 
-.hb{margin-top:5rem}
-@media (min-width:768px){.hb{margin-top:8rem}}
+/* gap between the cards and "An Artist" (small on purpose) */
+.hb{margin-top:1rem}
+@media (min-width:768px){.hb{margin-top:1.5rem}}
 
 /* each line fills the full screen width: font-size = container width / text width (in em).
    --hb-w is the text's width at 1em in this font (kerning off so the number is exact). */
 .hb-fit{container-type:inline-size;width:100%;overflow-x:clip}
-.hb-artist-wrap{position:relative;z-index:2}   /* "An Artist" stays in front of the photo while it parallaxes */
 .hb-line{
   margin:0;white-space:nowrap;font-family:"Roboto Condensed Light","Roboto Condensed","Arial Narrow",sans-serif;
-  font-weight:300;font-kerning:none;letter-spacing:0;line-height:.9;
+  font-weight:300;font-kerning:none;letter-spacing:0;line-height:.8;   /* tight box: the letters' bottom sits on the box bottom */
   font-size:calc(100cqw / var(--hb-w));
 }
-.hb-artist{color:var(--hb-artist);--hb-w:3.253;
-  /* parallax: "An Artist" scrolls slower than the page, so it slowly slides down over the photo (it is in front of the photo) */
-  transform:translate3d(0,calc(var(--p,0) * 60%),0);will-change:transform}
+.hb-artist{color:var(--hb-artist);--hb-w:3.253}
 .hb-essential{color:var(--hb-essential);--hb-w:4.621}
 
-/* photo: wide crop, blue layer on top that gets solid at the bottom */
-.hb-photo{position:relative;z-index:1;width:100%;aspect-ratio:4/5;overflow:hidden;background:#000}
-@media (min-width:768px){.hb-photo{aspect-ratio:4/3}}
-.hb-photo{--hb-over:.16}
-.hb-photo img{position:absolute;left:0;top:0;width:100%;height:calc(100% * (1 + var(--hb-over)));object-fit:cover;object-position:50% 0%;display:block;
-  /* parallax: the picture drifts up slower than the page. --p comes from parallax.ts (0 → 1). .16/1.16 = 13.79% of the img height = .16 of the box */
-  transform:translate3d(0,calc(var(--p,0) * -13.79%),0);will-change:transform}
-.hb-photo::after{
+/* "An Artist" block has its own background (same as the page) and sits in front of the photo */
+.hb-top{position:relative;z-index:2;background:var(--hb-page)}
+
+/* PHOTO. Its box (.hb-photo) is the normal-flow place right under "An Artist". The picture inside (.hb-photo-layer) is
+   held still on the screen (bottom of the picture on the bottom of the screen) while "An Artist" scrolls up and uncovers it.
+   It is only visible through its box, so nothing shows above "An Artist"'s bottom edge. Once the picture's top meets "An Artist"'s
+   bottom edge, --pin becomes 0 and it scrolls normally with the page. --pin is set by parallax.ts (px, 0 or negative).
+   Height is never taller than the screen. */
+.hb-photo{position:relative;z-index:1;width:100%;overflow:hidden;background:var(--hb-blue);
+  height:min(125vw,100vh);height:min(125vw,100svh)}
+@media (min-width:768px){.hb-photo{height:min(75vw,100vh);height:min(75vw,100svh)}}
+.hb-photo-layer{position:absolute;inset:0;transform:translate3d(0,var(--pin,0px),0);will-change:transform}
+.hb-photo-layer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0%;display:block}
+/* blue layer on the picture: lighter on top, solid blue at the bottom (moves together with the picture) */
+.hb-photo-layer::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(to bottom,
     rgb(0 18 255 / .38) 0%,
@@ -40,23 +45,22 @@
     var(--hb-blue) 100%);
 }
 
-/* bright blue behind "An Essential", then a fade into the dark end colour #030392 that holds the footer card (same colour, so they merge) down to the very bottom of the page */
-.hb-blue{background:var(--hb-blue)}
-.hb-half{container-type:inline-size;width:100%;text-align:center;padding:3rem 0 0;overflow-x:clip}
-.hb-half .hb-line{font-size:calc(75cqw / var(--hb-w))}   /* 75% of the page width (was 50%: 1.5x bigger) */
-/* long fade with eased (smoothstep) stops, so there is no visible start/end line between #0012ff and #030392 */
-.hb-fade{height:clamp(10rem,22vw,20rem);background:linear-gradient(to bottom,
+/* bright blue behind "An Essential" (75% of the page width, centred) ... */
+.hb-blue{background:var(--hb-blue);margin-top:-1px}   /* -1px: no hairline between the photo and the blue */
+.hb-half{container-type:inline-size;width:100%;text-align:center;padding:3rem 0 1.25rem;overflow-x:clip}
+.hb-half .hb-line{font-size:calc(75cqw / var(--hb-w))}
+/* ... then a SHORT eased fade into the dark end colour #030392, and the footer card right under it */
+.hb-fade{height:clamp(2.5rem,6vw,5rem);background:linear-gradient(to bottom,
     rgb(0 18 255) 0.0%,
-    rgb(0 18 253) 8.3%,
-    rgb(0 17 247) 16.7%,
-    rgb(0 16 238) 25.0%,
-    rgb(1 14 227) 33.3%,
-    rgb(1 12 214) 41.7%,
+    rgb(0 18 252) 10.0%,
+    rgb(0 16 244) 20.0%,
+    rgb(1 15 231) 30.0%,
+    rgb(1 13 217) 40.0%,
     rgb(2 10 200) 50.0%,
-    rgb(2 9 187) 58.3%,
-    rgb(2 7 174) 66.7%,
-    rgb(3 5 163) 75.0%,
-    rgb(3 4 154) 83.3%,
-    rgb(3 3 148) 91.7%,
+    rgb(2 8 184) 60.0%,
+    rgb(2 6 170) 70.0%,
+    rgb(3 5 157) 80.0%,
+    rgb(3 3 149) 90.0%,
     rgb(3 3 146) 100.0%)}
-.hb-end{background:var(--hb-end);display:flow-root}      /* flow-root: footer's top margin stays inside the dark block */
+.hb-end{background:var(--hb-end);display:flow-root}
+.hb-end footer{margin-top:0}   /* footer sits just under the fade (its own top margin removed) */
