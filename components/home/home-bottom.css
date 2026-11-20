@@ -24,49 +24,32 @@
 /* "An Artist" block has its own background (same as the page) and sits in front of the photo */
 .hb-top{position:relative;z-index:2;background:var(--hb-page)}
 
-/* PHOTO. Its box (.hb-photo) is the normal-flow place right under "An Artist". The picture inside (.hb-photo-layer) is
-   held still on the screen (bottom of the picture on the bottom of the screen) while "An Artist" scrolls up and uncovers it.
-   It is only visible through its box, so nothing shows above "An Artist"'s bottom edge. Once the picture's top meets "An Artist"'s
-   bottom edge, --pin becomes 0 and it scrolls normally with the page. --pin is set by parallax.ts (px, 0 or negative).
-   "An Essential" sits INSIDE the photo box, its bottom edge exactly on the photo's bottom edge, so the whole picture shows behind it. */
-.hb-photo{position:relative;z-index:1;width:100%;overflow:hidden;background:var(--hb-blue);
-  height:min(125vw,100vh);height:min(125vw,100svh)}
-@media (min-width:768px){.hb-photo{height:min(75vw,140vh);height:min(75vw,140svh)}}
+/* PHOTO. Its box (.hb-photo) is the normal-flow place right under "An Artist", as tall as it is wide (the picture is square, so the whole picture shows).
+   The picture inside (.hb-photo-layer) is held still on the screen while "An Artist" scrolls up and uncovers it. It is only visible through
+   its box, so nothing shows above "An Artist"'s bottom edge. When the picture's top meets "An Artist"'s bottom edge, --pin becomes 0 and it
+   scrolls normally with the page, so you get to see all of it. --pin is set by parallax.ts (px, 0 or negative).
+   "An Essential" sits INSIDE the photo box, its bottom edge exactly on the photo's bottom edge. */
+.hb-photo{position:relative;z-index:1;width:100%;aspect-ratio:1/1;overflow:hidden;background:var(--hb-end)}
 .hb-photo-layer{position:absolute;inset:0;transform:translate3d(0,var(--pin,0px),0);will-change:transform}
-.hb-photo-layer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0%;display:block}
-/* blue layer on the picture: light almost all the way down (picture stays visible), turning solid #0012ff only at the very bottom edge
-   so it joins the gradient below with no line. It moves together with the picture. */
+.hb-photo-layer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block}
+/* #030392 layer on the picture: light all the way down (picture stays visible), solid #030392 only at the very bottom edge,
+   so the picture melts into the footer colour below with no line. It moves together with the picture. */
 .hb-photo-layer::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(to bottom,
-    rgb(0 18 255 / .36) 0%,
-    rgb(0 18 255 / .42) 50%,
-    rgb(0 18 255 / .50) 72%,
-    rgb(0 18 255 / .58) 84%,
-    rgb(0 18 255 / .70) 91%,
-    rgb(0 18 255 / .86) 96.5%,
-    var(--hb-blue) 100%);
+    rgb(3 3 146 / .34) 0%,
+    rgb(3 3 146 / .40) 50%,
+    rgb(3 3 146 / .48) 75%,
+    rgb(3 3 146 / .58) 86%,
+    rgb(3 3 146 / .74) 93%,
+    rgb(3 3 146 / .90) 97.5%,
+    var(--hb-end) 100%);
 }
 
 /* "An Essential": 75% of the page width, centred, bottom edge = photo's bottom edge */
 .hb-half{position:absolute;z-index:2;left:0;right:0;bottom:0;container-type:inline-size;text-align:center;overflow-x:clip}
 .hb-half .hb-line{font-size:calc(75cqw / var(--hb-w))}
 
-/* below the photo: one short eased gradient (smootherstep: zero slope at both ends) from the photo's solid #0012ff into #030392,
-   which is exactly the colour of the footer block under it */
-.hb-blue{height:clamp(4rem,9vw,7rem);margin-top:-1px;background:linear-gradient(to bottom,
-    rgb(0 18 255) 0.0%,
-    rgb(0 18 254) 8.33%,
-    rgb(0 17 251) 16.67%,
-    rgb(0 16 244) 25.0%,
-    rgb(1 15 232) 33.33%,
-    rgb(1 13 217) 41.67%,
-    rgb(2 10 200) 50.0%,
-    rgb(2 8 184) 58.33%,
-    rgb(2 6 169) 66.67%,
-    rgb(3 5 157) 75.0%,
-    rgb(3 4 150) 83.33%,
-    rgb(3 3 147) 91.67%,
-    rgb(3 3 146) 100.0%)}   /* -1px: no hairline between the photo and the blue */
-.hb-end{background:var(--hb-end);display:flow-root}
-.hb-end footer{margin-top:0}   /* footer sits right under the gradient (its own top margin removed) */
+/* website end colour #030392: the footer block (and the footer card inside it) start right under the photo */
+.hb-end{background:var(--hb-end);display:flow-root;margin-top:-1px}   /* -1px: no hairline under the photo */
+.hb-end footer{margin-top:0}   /* footer sits right under the photo (its own top margin removed) */
