@@ -45,22 +45,29 @@
     var(--hb-blue) 100%);
 }
 
-/* bright blue behind "An Essential" (75% of the page width, centred) ... */
-.hb-blue{background:var(--hb-blue);margin-top:-1px}   /* -1px: no hairline between the photo and the blue */
-.hb-half{container-type:inline-size;width:100%;text-align:center;padding:3rem 0 1.25rem;overflow-x:clip}
-.hb-half .hb-line{font-size:calc(75cqw / var(--hb-w))}
-/* ... then a SHORT eased fade into the dark end colour #030392, and the footer card right under it */
-.hb-fade{height:clamp(2.5rem,6vw,5rem);background:linear-gradient(to bottom,
+/* ONE long eased gradient runs through the whole blue block (from the photo's solid blue, behind "An Essential", down to the footer),
+   so #0012ff turns into #030392 slowly with no flat band and no visible start/end line (smootherstep: zero slope at both ends).
+   It ends exactly on the colour of the footer block below. */
+.hb-blue{margin-top:-1px;background:linear-gradient(to bottom,
     rgb(0 18 255) 0.0%,
-    rgb(0 18 252) 10.0%,
-    rgb(0 16 244) 20.0%,
-    rgb(1 15 231) 30.0%,
-    rgb(1 13 217) 40.0%,
+    rgb(0 18 255) 6.25%,
+    rgb(0 18 253) 12.5%,
+    rgb(0 17 250) 18.75%,
+    rgb(0 16 244) 25.0%,
+    rgb(1 15 235) 31.25%,
+    rgb(1 14 225) 37.5%,
+    rgb(1 12 213) 43.75%,
     rgb(2 10 200) 50.0%,
-    rgb(2 8 184) 60.0%,
-    rgb(2 6 170) 70.0%,
-    rgb(3 5 157) 80.0%,
-    rgb(3 3 149) 90.0%,
-    rgb(3 3 146) 100.0%)}
+    rgb(2 9 188) 56.25%,
+    rgb(2 7 176) 62.5%,
+    rgb(2 6 166) 68.75%,
+    rgb(3 5 157) 75.0%,
+    rgb(3 4 151) 81.25%,
+    rgb(3 3 148) 87.5%,
+    rgb(3 3 146) 93.75%,
+    rgb(3 3 146) 100.0%)}   /* -1px: no hairline between the photo and the blue */
+.hb-half{container-type:inline-size;width:100%;text-align:center;padding:3rem 0 1.25rem;overflow-x:clip}
+.hb-half .hb-line{font-size:calc(75cqw / var(--hb-w))}   /* 75% of the page width, centred */
+.hb-fade{height:clamp(2.5rem,6vw,5rem)}                    /* only spacing under the text; the gradient is on .hb-blue */
 .hb-end{background:var(--hb-end);display:flow-root}
 .hb-end footer{margin-top:0}   /* footer sits just under the fade (its own top margin removed) */
